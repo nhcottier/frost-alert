@@ -114,7 +114,7 @@ struct DashboardView: View {
             }
         case .loaded(let assessments):
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 16) {
                     NotificationPermissionBanner()
                     DashboardHeader(assessments: assessments)
                     ForEach(assessments) { assessment in
@@ -123,7 +123,8 @@ struct DashboardView: View {
                     DisclaimerView()
                 }
                 .padding(.horizontal, 18)
-                .padding(.vertical, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 18)
             }
             .onAppear {
                 collapseLoadedLocationsIfNeeded(assessments)
@@ -194,17 +195,18 @@ private struct DashboardHeader: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Tonight and tomorrow morning")
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(FrostPalette.ink.opacity(0.72))
+                .foregroundStyle(FrostPalette.secondaryText)
             Text(highestRisk.rawValue)
-                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .font(.system(.largeTitle, design: .rounded, weight: .semibold))
                 .foregroundStyle(highestRisk.color)
                 .minimumScaleFactor(0.8)
             Text("Focused frost guidance for growing locations, not a full weather dashboard.")
                 .font(.callout)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(FrostPalette.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 4)
+        .padding(.top, 2)
+        .padding(.bottom, 4)
     }
 }
 
@@ -318,11 +320,12 @@ private struct LocationRiskCard: View {
             }
         }
         .padding(16)
-        .background(.white, in: RoundedRectangle(cornerRadius: 8))
+        .background(FrostPalette.card, in: RoundedRectangle(cornerRadius: 8))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(assessment.level.color.opacity(0.35), lineWidth: 1)
+                .stroke(assessment.level.cardStroke, lineWidth: 1)
         )
+        .shadow(color: FrostPalette.shadow, radius: 10, x: 0, y: 5)
     }
 
     private var frostPeriodText: String {
@@ -376,7 +379,7 @@ private struct ThreeDayOutlookView: View {
             }
         }
         .padding(12)
-        .background(FrostPalette.background, in: RoundedRectangle(cornerRadius: 8))
+        .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -437,7 +440,7 @@ private struct RiskBadge: View {
             .foregroundStyle(level.color)
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
-            .background(level.color.opacity(0.12), in: Capsule())
+            .background(level.badgeBackground, in: Capsule())
             .accessibilityLabel("Risk level \(level.rawValue)")
     }
 }
@@ -451,9 +454,9 @@ private struct MetricRow: View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .frame(width: 22)
-                .foregroundStyle(FrostPalette.blue)
+                .foregroundStyle(FrostPalette.accent)
             Text(label)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(FrostPalette.secondaryText)
             Spacer(minLength: 8)
             Text(value)
                 .fontWeight(.semibold)
@@ -507,7 +510,7 @@ private struct Banner: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(FrostPalette.blue)
+                .foregroundStyle(FrostPalette.accent)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
@@ -524,18 +527,26 @@ private struct Banner: View {
             }
         }
         .padding(14)
-        .background(FrostPalette.blue.opacity(0.09), in: RoundedRectangle(cornerRadius: 8))
+        .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(FrostPalette.separator, lineWidth: 1)
+        )
     }
 }
 
 private struct DisclaimerView: View {
     var body: some View {
-        Text("Forecasts are guidance only. Weather data may come from Apple Weather or Open-Meteo. For high-value crops, use local sensors and professional frost systems as needed.")
+        Text("Forecasts are guidance only. For high-value crops, use local sensors and professional frost systems as needed.")
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(FrostPalette.secondaryText)
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(FrostPalette.soil.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+            .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(FrostPalette.separator, lineWidth: 1)
+            )
     }
 }
 
@@ -558,7 +569,7 @@ private struct EmptyStateView: View {
         VStack(spacing: 16) {
             Image(systemName: "leaf.circle")
                 .font(.system(size: 54))
-                .foregroundStyle(FrostPalette.green)
+                .foregroundStyle(FrostPalette.safe)
             Text("Add a growing location")
                 .font(.title2.weight(.semibold))
             Text("Frost Alert needs at least one garden, block, nursery, orchard, or vineyard location to assess tonight’s risk.")
@@ -676,7 +687,7 @@ private struct LocationEditorView: View {
                         } label: {
                             HStack(spacing: 12) {
                                 Image(systemName: selectedResult == result ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(selectedResult == result ? FrostPalette.green : .secondary)
+                                    .foregroundStyle(selectedResult == result ? FrostPalette.accent : .secondary)
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(result.name)
                                         .foregroundStyle(FrostPalette.ink)
@@ -813,20 +824,54 @@ private enum SensitivityOption: String, CaseIterable, Identifiable {
 }
 
 private enum FrostPalette {
-    static let background = Color(red: 0.95, green: 0.97, blue: 0.94)
-    static let ink = Color(red: 0.09, green: 0.15, blue: 0.13)
-    static let green = Color(red: 0.19, green: 0.45, blue: 0.28)
-    static let blue = Color(red: 0.18, green: 0.42, blue: 0.56)
-    static let soil = Color(red: 0.44, green: 0.34, blue: 0.22)
+    static let background = Color(red: 0.92, green: 0.96, blue: 1.0)
+    static let card = Color(uiColor: .secondarySystemGroupedBackground)
+    static let panel = Color(red: 0.96, green: 0.98, blue: 1.0)
+    static let separator = Color(uiColor: .separator).opacity(0.22)
+    static let shadow = Color(red: 0.04, green: 0.12, blue: 0.24).opacity(0.08)
+    static let ink = Color(red: 0.06, green: 0.12, blue: 0.20)
+    static let secondaryText = Color(uiColor: .secondaryLabel)
+    static let safe = Color(red: 0.15, green: 0.47, blue: 0.30)
+    static let accent = Color(red: 0.06, green: 0.35, blue: 0.67)
+    static let frost = Color(red: 0.02, green: 0.27, blue: 0.66)
+    static let severe = Color(red: 0.01, green: 0.16, blue: 0.42)
+    static let watch = Color(red: 0.62, green: 0.42, blue: 0.07)
+    static let blue = accent
 }
 
 private extension FrostRiskLevel {
     var color: Color {
         switch self {
-        case .safe: FrostPalette.green
-        case .watch: Color(red: 0.68, green: 0.47, blue: 0.08)
-        case .frostLikely: Color(red: 0.14, green: 0.45, blue: 0.72)
-        case .severe: Color(red: 0.08, green: 0.25, blue: 0.58)
+        case .safe: FrostPalette.safe
+        case .watch: FrostPalette.watch
+        case .frostLikely: FrostPalette.frost
+        case .severe: FrostPalette.severe
+        }
+    }
+
+    var badgeBackground: Color {
+        switch self {
+        case .safe:
+            return FrostPalette.safe.opacity(0.12)
+        case .watch:
+            return FrostPalette.watch.opacity(0.14)
+        case .frostLikely:
+            return FrostPalette.frost.opacity(0.12)
+        case .severe:
+            return FrostPalette.severe.opacity(0.12)
+        }
+    }
+
+    var cardStroke: Color {
+        switch self {
+        case .safe:
+            return FrostPalette.separator
+        case .watch:
+            return FrostPalette.watch.opacity(0.24)
+        case .frostLikely:
+            return FrostPalette.frost.opacity(0.24)
+        case .severe:
+            return FrostPalette.severe.opacity(0.28)
         }
     }
 }
