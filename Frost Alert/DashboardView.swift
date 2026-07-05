@@ -175,7 +175,7 @@ private struct LocationRiskCard: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 MetricRow(icon: "thermometer.low", label: "Expected low", value: "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
-                MetricRow(icon: "clock", label: "Likely frost window", value: frostWindowText)
+                MetricRow(icon: "clock", label: "Frost forecast period", value: frostPeriodText)
                 MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
             }
 
@@ -211,9 +211,9 @@ private struct LocationRiskCard: View {
         )
     }
 
-    private var frostWindowText: String {
+    private var frostPeriodText: String {
         guard let start = assessment.likelyStart, let end = assessment.likelyEnd else {
-            return "No clear frost window"
+            return "No frost period forecast"
         }
         return "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
     }

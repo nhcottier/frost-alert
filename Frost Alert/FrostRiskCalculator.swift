@@ -89,13 +89,13 @@ struct FrostRiskCalculator {
         let thresholdText = threshold.formatted(.number.precision(.fractionLength(0...1)))
         switch level {
         case .safe:
-            return "Frost is not expected for \(location.crop.lowercased()). The forecast low is about \(low) C against your \(thresholdText) C threshold."
+            return "Frost is not forecast for \(location.crop.lowercased()). The expected low is \(low) C, above your \(thresholdText) C threshold."
         case .watch:
-            return "Conditions are close enough to watch. The forecast low is about \(low) C, near your \(thresholdText) C threshold."
+            return "Frost is not forecast, but conditions may become marginal. The expected low is \(low) C, near your \(thresholdText) C threshold."
         case .frostLikely:
-            return "Frost is likely overnight. Protect \(location.crop.lowercased()) before temperatures bottom out near \(low) C."
+            return "Frost is forecast overnight. Protect \(location.crop.lowercased()) before temperatures reach the expected low of \(low) C."
         case .severe:
-            return "Severe frost risk. Expect damaging conditions near \(low) C unless protection is in place."
+            return "Severe frost risk is forecast. Damaging conditions are possible near \(low) C unless protection is in place."
         }
     }
 
@@ -115,15 +115,15 @@ struct FrostRiskCalculator {
         if hours.contains(where: { $0.humidity >= 82 || dewSpread($0) <= 2.5 }) {
             drivers.append("Moist air may support frost formation")
         }
-        return drivers.isEmpty ? ["No strong frost-forming signals in the overnight window"] : drivers
+        return drivers.isEmpty ? ["No strong frost-forming signals in the overnight forecast period"] : drivers
     }
 
     private func actions(for level: FrostRiskLevel, sensitivity: PlantSensitivity) -> [String] {
         switch level {
         case .safe:
-            return ["No frost action needed tonight.", "Review again if the forecast changes."]
+            return ["No frost protection is needed for the current forecast.", "Check again if the forecast changes."]
         case .watch:
-            return ["Check seedlings, citrus, tomatoes, chillies, and young vines.", "Have frost cloth or covers ready before dusk."]
+            return ["Check frost-sensitive plants such as seedlings, citrus, tomatoes, chillies, and young vines.", "Prepare frost cloth or covers before evening if conditions cool further."]
         case .frostLikely:
             return ["Cover sensitive plants before evening temperatures drop.", "Move pots inside or under shelter.", "Check irrigation, frost cloth, or frost fans."]
         case .severe:
@@ -131,4 +131,3 @@ struct FrostRiskCalculator {
         }
     }
 }
-
