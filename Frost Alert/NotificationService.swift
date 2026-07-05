@@ -35,6 +35,13 @@ final class NotificationService: ObservableObject {
         }
     }
 
+    func cancelAlerts(for locationID: UUID) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [
+            "evening-\(locationID.uuidString)",
+            "morning-\(locationID.uuidString)"
+        ])
+    }
+
     private func scheduleEveningWarning(for assessment: LocationAssessment) async {
         let content = UNMutableNotificationContent()
         content.title = "\(assessment.location.name): \(assessment.assessment.level.rawValue)"

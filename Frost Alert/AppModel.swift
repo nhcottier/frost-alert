@@ -80,6 +80,25 @@ final class AppModel: ObservableObject {
         saveLocations()
     }
 
+    func updateLocation(id: UUID, name: String, crop: String, sensitivity: PlantSensitivity, searchResult: LocationSearchResult) {
+        guard let index = locations.firstIndex(where: { $0.id == id }) else { return }
+
+        let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanCrop = crop.trimmingCharacters(in: .whitespacesAndNewlines)
+        locations[index].name = cleanName.isEmpty ? searchResult.name : cleanName
+        locations[index].subtitle = searchResult.subtitle
+        locations[index].crop = cleanCrop.isEmpty ? "Sensitive plants" : cleanCrop
+        locations[index].sensitivity = sensitivity
+        locations[index].coordinate = searchResult.coordinate
+        saveLocations()
+    }
+
+    func deleteLocation(id: UUID) {
+        locations.removeAll { $0.id == id }
+        notifications.cancelAlerts(for: id)
+        saveLocations()
+    }
+
     private func loadSavedLocations() -> [GrowingLocation] {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return [] }
         return (try? JSONDecoder().decode([GrowingLocation].self, from: data)) ?? []

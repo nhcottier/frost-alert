@@ -6,6 +6,8 @@ struct DashboardView: View {
     @EnvironmentObject private var appModel: AppModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var showingAddLocation = false
+    @State private var editingLocation: GrowingLocation?
+    @State private var deletingLocation: GrowingLocation?
 
     var body: some View {
         NavigationStack {
@@ -35,12 +37,38 @@ struct DashboardView: View {
                 Task { await appModel.refreshNotificationPermission() }
             }
             .sheet(isPresented: $showingAddLocation) {
-                AddLocationView { name, crop, sensitivity, result in
+                LocationEditorView { name, crop, sensitivity, result in
                     appModel.addLocation(name: name, crop: crop, sensitivity: sensitivity, searchResult: result)
                     Task { await appModel.load() }
                 }
             }
+            .sheet(item: $editingLocation) { location in
+                LocationEditorView(location: location) { name, crop, sensitivity, result in
+                    appModel.updateLocation(id: location.id, name: name, crop: crop, sensitivity: sensitivity, searchResult: result)
+                    Task { await appModel.load() }
+                }
+            }
+            .alert("Delete location?", isPresented: deleteConfirmationBinding, presenting: deletingLocation) { location in
+                Button("Delete", role: .destructive) {
+                    appModel.deleteLocation(id: location.id)
+                    Task { await appModel.load() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { location in
+                Text("This removes \(location.name) and its scheduled frost alerts.")
+            }
         }
+    }
+
+    private var deleteConfirmationBinding: Binding<Bool> {
+        Binding(
+            get: { deletingLocation != nil },
+            set: { isPresented in
+                if !isPresented {
+                    deletingLocation = nil
+                }
+            }
+        )
     }
 
     @ViewBuilder
@@ -62,7 +90,11 @@ struct DashboardView: View {
                     NotificationPermissionBanner()
                     DashboardHeader(assessments: assessments)
                     ForEach(assessments) { assessment in
-                        LocationRiskCard(locationAssessment: assessment)
+                        LocationRiskCard(
+                            locationAssessment: assessment,
+                            edit: { editingLocation = assessment.location },
+                            delete: { deletingLocation = assessment.location }
+                        )
                     }
                     DisclaimerView()
                 }
@@ -100,6 +132,8 @@ private struct DashboardHeader: View {
 
 private struct LocationRiskCard: View {
     var locationAssessment: LocationAssessment
+    var edit: () -> Void
+    var delete: () -> Void
 
     private var assessment: FrostRiskAssessment { locationAssessment.assessment }
     private var location: GrowingLocation { locationAssessment.location }
@@ -116,7 +150,27 @@ private struct LocationRiskCard: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 12)
-                RiskBadge(level: assessment.level)
+                VStack(alignment: .trailing, spacing: 8) {
+                    RiskBadge(level: assessment.level)
+                    Menu {
+                        Button {
+                            edit()
+                        } label: {
+                            Label("Edit location", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            delete()
+                        } label: {
+                            Label("Delete location", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 36, height: 36)
+                    }
+                    .accessibilityLabel("Location options")
+                }
             }
 
             VStack(alignment: .leading, spacing: 10) {
@@ -331,7 +385,7 @@ private struct ErrorStateView: View {
     }
 }
 
-private struct AddLocationView: View {
+private struct LocationEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var currentLocationService = CurrentLocationService()
     @State private var name = ""
@@ -346,8 +400,22 @@ private struct AddLocationView: View {
     @State private var errorMessage: String?
 
     private let searchService = LocationSearchService()
+    private let location: GrowingLocation?
 
     var onSave: (String, String, PlantSensitivity, LocationSearchResult) -> Void
+
+    init(location: GrowingLocation? = nil, onSave: @escaping (String, String, PlantSensitivity, LocationSearchResult) -> Void) {
+        self.location = location
+        self.onSave = onSave
+        let initialSensitivity = SensitivityOption(sensitivity: location?.sensitivity ?? .sensitive)
+        _name = State(initialValue: location?.name ?? "")
+        _locationQuery = State(initialValue: location?.subtitle ?? "")
+        _crop = State(initialValue: location?.crop == "Sensitive plants" ? "" : location?.crop ?? "")
+        _sensitivity = State(initialValue: initialSensitivity)
+        _customThreshold = State(initialValue: location?.sensitivity.thresholdCelsius ?? PlantSensitivity.sensitive.thresholdCelsius)
+        _selectedResult = State(initialValue: location.flatMap(Self.searchResult))
+        _searchResults = State(initialValue: location.flatMap { [Self.searchResult(for: $0)].compactMap { $0 } } ?? [])
+    }
 
     var body: some View {
         NavigationStack {
@@ -430,7 +498,7 @@ private struct AddLocationView: View {
                     }
                 }
             }
-            .navigationTitle("Add location")
+            .navigationTitle(location == nil ? "Add location" : "Edit location")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -497,6 +565,15 @@ private struct AddLocationView: View {
         case .custom: .custom(customThreshold)
         }
     }
+
+    private static func searchResult(for location: GrowingLocation) -> LocationSearchResult? {
+        guard let coordinate = location.coordinate else { return nil }
+        return LocationSearchResult(
+            name: location.name,
+            subtitle: location.subtitle,
+            coordinate: coordinate
+        )
+    }
 }
 
 private enum SensitivityOption: String, CaseIterable, Identifiable {
@@ -513,6 +590,15 @@ private enum SensitivityOption: String, CaseIterable, Identifiable {
         case .sensitive: "Sensitive"
         case .verySensitive: "Very sensitive"
         case .custom: "Custom threshold"
+        }
+    }
+
+    init(sensitivity: PlantSensitivity) {
+        switch sensitivity {
+        case .hardy: self = .hardy
+        case .sensitive: self = .sensitive
+        case .verySensitive: self = .verySensitive
+        case .custom: self = .custom
         }
     }
 }
