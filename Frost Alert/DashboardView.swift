@@ -686,8 +686,8 @@ private extension FrostRiskLevel {
         switch self {
         case .safe: FrostPalette.green
         case .watch: Color(red: 0.68, green: 0.47, blue: 0.08)
-        case .frostLikely: FrostPalette.blue
-        case .severe: Color(red: 0.54, green: 0.13, blue: 0.16)
+        case .frostLikely: Color(red: 0.14, green: 0.45, blue: 0.72)
+        case .severe: Color(red: 0.08, green: 0.25, blue: 0.58)
         }
     }
 }
