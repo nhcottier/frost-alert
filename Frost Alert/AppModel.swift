@@ -36,10 +36,7 @@ final class AppModel: ObservableObject {
 
         state = .loading
         do {
-            let provider = FallbackWeatherProvider(
-                primary: WeatherKitProvider(),
-                fallback: OpenMeteoWeatherProvider()
-            )
+            let provider = WeatherKitProvider()
             var assessments: [LocationAssessment] = []
             var scheduledAssessments: [ScheduledLocationAssessment] = []
             for location in locations {
