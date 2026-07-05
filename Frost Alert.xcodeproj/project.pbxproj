@@ -1,0 +1,438 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		129FB85302FC054446D339A5 /* FrostRiskCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */; };
+		2623CA88FFFA15431D69CD84 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD833F95EDAE0AADA79C18AF /* Assets.xcassets */; };
+		278171EA6F7BFAEF85051F9F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61AF54702C9B25968C1E7E /* Models.swift */; };
+		55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5077C258B1F292F1AA43FC /* DashboardView.swift */; };
+		840D186585E69573B6A27BEC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4703A62EFB4A3126B4135CAE /* AppModel.swift */; };
+		92904C50D43CCC3825E92B17 /* FrostRiskCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */; };
+		D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FC4FAC1F54BA51891E370E /* NotificationService.swift */; };
+		E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BA18A84370C80E66640DDB /* FrostAlertApp.swift */; };
+		F5C7B4D2962ABCA12B99681D /* WeatherProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C31D2020E171F0EA9A3057ED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D6C81D50954EA709FDC1F496 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5210FAFDFE45DA4E228D8179;
+			remoteInfo = "Frost Alert";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		03FC4FAC1F54BA51891E370E /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostRiskCalculator.swift; sourceTree = "<group>"; };
+		1E5077C258B1F292F1AA43FC /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		1E5E0C9438F68D98995951EE /* Frost AlertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Frost AlertTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4703A62EFB4A3126B4135CAE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		58747715F755AB734D76BA9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		83BA18A84370C80E66640DDB /* FrostAlertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostAlertApp.swift; sourceTree = "<group>"; };
+		885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Frost Alert.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB61AF54702C9B25968C1E7E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		AD833F95EDAE0AADA79C18AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostRiskCalculatorTests.swift; sourceTree = "<group>"; };
+		FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherProvider.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		6F980473C7684ABE8EE6BEA2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */,
+				1E5E0C9438F68D98995951EE /* Frost AlertTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9A550F0EA64DD89050304018 /* Frost Alert */ = {
+			isa = PBXGroup;
+			children = (
+				4703A62EFB4A3126B4135CAE /* AppModel.swift */,
+				AD833F95EDAE0AADA79C18AF /* Assets.xcassets */,
+				1E5077C258B1F292F1AA43FC /* DashboardView.swift */,
+				83BA18A84370C80E66640DDB /* FrostAlertApp.swift */,
+				0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */,
+				58747715F755AB734D76BA9F /* Info.plist */,
+				AB61AF54702C9B25968C1E7E /* Models.swift */,
+				03FC4FAC1F54BA51891E370E /* NotificationService.swift */,
+				FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */,
+			);
+			path = "Frost Alert";
+			sourceTree = "<group>";
+		};
+		DAA4397423EDB2AA40AD72EB /* Frost AlertTests */ = {
+			isa = PBXGroup;
+			children = (
+				BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */,
+			);
+			path = "Frost AlertTests";
+			sourceTree = "<group>";
+		};
+		F333C330ED93EE27338CA199 = {
+			isa = PBXGroup;
+			children = (
+				9A550F0EA64DD89050304018 /* Frost Alert */,
+				DAA4397423EDB2AA40AD72EB /* Frost AlertTests */,
+				6F980473C7684ABE8EE6BEA2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1C0D2368EA2732547651EA8D /* Frost AlertTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE9CA314B09A7E77B6208A6A /* Build configuration list for PBXNativeTarget "Frost AlertTests" */;
+			buildPhases = (
+				99C7DBFEA959AE7E065483CB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D677B9E0F68D0EEC1C423CDB /* PBXTargetDependency */,
+			);
+			name = "Frost AlertTests";
+			packageProductDependencies = (
+			);
+			productName = "Frost AlertTests";
+			productReference = 1E5E0C9438F68D98995951EE /* Frost AlertTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5210FAFDFE45DA4E228D8179 /* Frost Alert */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23A45AD6CA20946509C903FE /* Build configuration list for PBXNativeTarget "Frost Alert" */;
+			buildPhases = (
+				AEE7414648C80DD31FAD48B3 /* Sources */,
+				EA282242CB7B50447382C66B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Frost Alert";
+			packageProductDependencies = (
+			);
+			productName = "Frost Alert";
+			productReference = 885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D6C81D50954EA709FDC1F496 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1C0D2368EA2732547651EA8D = {
+						DevelopmentTeam = "";
+					};
+					5210FAFDFE45DA4E228D8179 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = ED7713CD1F45EBED150E71FF /* Build configuration list for PBXProject "Frost Alert" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F333C330ED93EE27338CA199;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6F980473C7684ABE8EE6BEA2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5210FAFDFE45DA4E228D8179 /* Frost Alert */,
+				1C0D2368EA2732547651EA8D /* Frost AlertTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EA282242CB7B50447382C66B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2623CA88FFFA15431D69CD84 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		99C7DBFEA959AE7E065483CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92904C50D43CCC3825E92B17 /* FrostRiskCalculatorTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEE7414648C80DD31FAD48B3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				840D186585E69573B6A27BEC /* AppModel.swift in Sources */,
+				55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */,
+				E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */,
+				129FB85302FC054446D339A5 /* FrostRiskCalculator.swift in Sources */,
+				278171EA6F7BFAEF85051F9F /* Models.swift in Sources */,
+				D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */,
+				F5C7B4D2962ABCA12B99681D /* WeatherProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D677B9E0F68D0EEC1C423CDB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5210FAFDFE45DA4E228D8179 /* Frost Alert */;
+			targetProxy = C31D2020E171F0EA9A3057ED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		22EFDD867141C572C109FC1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Frost Alert/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Frost Alert";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		636A0AE231D4DE7661D0E676 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Frost Alert/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Frost Alert";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9749F68897AC18500CE71852 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		BE686E5D5E12B0A60AFEB588 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Frost Alert.app/Frost Alert";
+			};
+			name = Debug;
+		};
+		DDDFE76868A87A5CD3945482 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Frost Alert.app/Frost Alert";
+			};
+			name = Release;
+		};
+		F0F745AFB418207CC8A72E09 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		23A45AD6CA20946509C903FE /* Build configuration list for PBXNativeTarget "Frost Alert" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				636A0AE231D4DE7661D0E676 /* Debug */,
+				22EFDD867141C572C109FC1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		ED7713CD1F45EBED150E71FF /* Build configuration list for PBXProject "Frost Alert" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0F745AFB418207CC8A72E09 /* Debug */,
+				9749F68897AC18500CE71852 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FE9CA314B09A7E77B6208A6A /* Build configuration list for PBXNativeTarget "Frost AlertTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE686E5D5E12B0A60AFEB588 /* Debug */,
+				DDDFE76868A87A5CD3945482 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D6C81D50954EA709FDC1F496 /* Project object */;
+}
