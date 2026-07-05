@@ -2,6 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "FrostAlertIcon.png",
       "platform" : "ios",
       "size" : "1024x1024"
     }
@@ -11,4 +12,3 @@
     "version" : 1
   }
 }
-
