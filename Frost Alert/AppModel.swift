@@ -40,7 +40,7 @@ final class AppModel: ObservableObject {
             await notifications.refreshAuthorizationStatus()
             await notifications.scheduleAlerts(for: assessments)
         } catch {
-            state = .failed(error.localizedDescription)
+            state = .failed(userFacingForecastError(error))
         }
     }
 
@@ -67,5 +67,13 @@ final class AppModel: ObservableObject {
     private func saveLocations() {
         guard let data = try? JSONEncoder().encode(locations) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)
+    }
+
+    private func userFacingForecastError(_ error: Error) -> String {
+        let message = error.localizedDescription
+        if message.contains("WeatherDaemon") || message.contains("WDSJWTAuthenticator") {
+            return "Apple Weather is not ready to provide forecasts yet. Try again in a few minutes."
+        }
+        return message
     }
 }

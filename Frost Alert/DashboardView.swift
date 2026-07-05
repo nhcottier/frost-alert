@@ -323,6 +323,7 @@ private struct ErrorStateView: View {
 
 private struct AddLocationView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var currentLocationService = CurrentLocationService()
     @State private var name = ""
     @State private var locationQuery = ""
     @State private var crop = ""
@@ -331,6 +332,7 @@ private struct AddLocationView: View {
     @State private var searchResults: [LocationSearchResult] = []
     @State private var selectedResult: LocationSearchResult?
     @State private var isSearching = false
+    @State private var isUsingCurrentLocation = false
     @State private var errorMessage: String?
 
     private let searchService = LocationSearchService()
@@ -343,6 +345,18 @@ private struct AddLocationView: View {
                 Section("Location") {
                     TextField("Growing area name", text: $name)
                         .textInputAutocapitalization(.words)
+
+                    Button {
+                        Task { await useCurrentLocation() }
+                    } label: {
+                        if isUsingCurrentLocation {
+                            Label("Finding current location", systemImage: "location")
+                        } else {
+                            Label("Use current location", systemImage: "location.fill")
+                        }
+                    }
+                    .disabled(isSearching || isUsingCurrentLocation)
+
                     TextField("Town, address, vineyard, or orchard", text: $locationQuery)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.search)
@@ -436,6 +450,27 @@ private struct AddLocationView: View {
             selectedResult = results.first
             if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let first = results.first {
                 name = first.name
+            }
+        } catch {
+            searchResults = []
+            selectedResult = nil
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func useCurrentLocation() async {
+        isUsingCurrentLocation = true
+        errorMessage = nil
+        defer { isUsingCurrentLocation = false }
+
+        do {
+            let location = try await currentLocationService.currentLocation()
+            let result = try await searchService.result(for: location)
+            searchResults = [result]
+            selectedResult = result
+            locationQuery = result.subtitle
+            if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                name = result.name
             }
         } catch {
             searchResults = []
