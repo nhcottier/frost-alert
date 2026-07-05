@@ -88,7 +88,7 @@ struct OpenMeteoWeatherProvider: WeatherProviding {
             ].joined(separator: ",")),
             URLQueryItem(name: "wind_speed_unit", value: "kmh"),
             URLQueryItem(name: "timezone", value: "auto"),
-            URLQueryItem(name: "forecast_days", value: "2"),
+            URLQueryItem(name: "forecast_days", value: "4"),
             URLQueryItem(name: "timeformat", value: "unixtime")
         ]
 

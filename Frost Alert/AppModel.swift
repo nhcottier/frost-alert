@@ -22,8 +22,12 @@ final class AppModel: ObservableObject {
         locations = loadSavedLocations()
     }
 
-    func load() async {
-        await requestNotificationPermissionIfNeeded()
+    func load(requestNotificationPermission: Bool = true) async {
+        if requestNotificationPermission {
+            await requestNotificationPermissionIfNeeded()
+        } else {
+            await notifications.refreshAuthorizationStatus()
+        }
 
         guard !locations.isEmpty else {
             state = .empty
@@ -37,14 +41,16 @@ final class AppModel: ObservableObject {
                 fallback: OpenMeteoWeatherProvider()
             )
             var assessments: [LocationAssessment] = []
+            var scheduledAssessments: [ScheduledLocationAssessment] = []
             for location in locations {
                 let forecast = try await provider.forecast(for: location)
                 let assessment = calculator.assess(location: location, forecast: forecast)
                 assessments.append(LocationAssessment(location: location, assessment: assessment))
+                scheduledAssessments.append(contentsOf: alertAssessments(location: location, forecast: forecast))
             }
             state = .loaded(assessments.sorted { $0.assessment.level.sortOrder > $1.assessment.level.sortOrder })
             await notifications.refreshAuthorizationStatus()
-            await notifications.scheduleAlerts(for: assessments)
+            await notifications.scheduleAlerts(for: scheduledAssessments)
         } catch {
             state = .failed(userFacingForecastError(error))
         }
@@ -62,7 +68,9 @@ final class AppModel: ObservableObject {
 
     private func scheduleNotificationsIfLoaded() async {
         guard case .loaded(let assessments) = state else { return }
-        await notifications.scheduleAlerts(for: assessments)
+        await notifications.scheduleAlerts(for: assessments.map {
+            ScheduledLocationAssessment(location: $0.location, assessment: $0.assessment, nightStart: Date())
+        })
     }
 
     func addLocation(name: String, crop: String, sensitivity: PlantSensitivity, searchResult: LocationSearchResult) {
@@ -116,6 +124,17 @@ final class AppModel: ObservableObject {
 
         UserDefaults.standard.set(true, forKey: notificationPromptKey)
         await requestNotificationPermission()
+    }
+
+    private func alertAssessments(location: GrowingLocation, forecast: LocationForecast) -> [ScheduledLocationAssessment] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        return (0..<3).compactMap { dayOffset in
+            guard let nightStart = calendar.date(byAdding: .day, value: dayOffset, to: now) else { return nil }
+            let assessment = calculator.assess(location: location, forecast: forecast, now: nightStart)
+            return ScheduledLocationAssessment(location: location, assessment: assessment, nightStart: nightStart)
+        }
     }
 
     private func userFacingForecastError(_ error: Error) -> String {

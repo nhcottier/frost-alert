@@ -103,3 +103,13 @@ struct LocationAssessment: Identifiable, Equatable {
     var location: GrowingLocation
     var assessment: FrostRiskAssessment
 }
+
+struct ScheduledLocationAssessment: Identifiable, Equatable {
+    var id: String {
+        "\(location.id.uuidString)-\(nightStart.timeIntervalSince1970)"
+    }
+
+    var location: GrowingLocation
+    var assessment: FrostRiskAssessment
+    var nightStart: Date
+}

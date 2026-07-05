@@ -30,8 +30,12 @@ targets:
         CFBundleVersion: "1"
         ITSAppUsesNonExemptEncryption: false
         NSLocationWhenInUseUsageDescription: Frost Alert uses your location to find local Apple Weather forecasts for frost risk.
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.nickcottier.frostalert.refresh
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
+        UIBackgroundModes:
+          - fetch
         UILaunchScreen: {}
   Frost AlertTests:
     type: bundle.unit-test
