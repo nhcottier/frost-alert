@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import UserNotifications
+import UniformTypeIdentifiers
 
 struct DashboardView: View {
     @EnvironmentObject private var appModel: AppModel
@@ -10,6 +11,7 @@ struct DashboardView: View {
     @State private var deletingLocation: GrowingLocation?
     @State private var collapsedLocationIDs: Set<UUID> = []
     @State private var isReordering = false
+    @State private var draggingLocationID: UUID?
 
     var body: some View {
         NavigationStack {
@@ -114,25 +116,8 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     NotificationPermissionBanner()
                     DashboardHeader(assessments: assessments)
-                    ForEach(Array(assessments.enumerated()), id: \.element.id) { index, assessment in
-                        LocationRiskCard(
-                            locationAssessment: assessment,
-                            isCollapsed: isReordering || collapsedLocationIDs.contains(assessment.location.id),
-                            isReordering: isReordering,
-                            canMoveUp: index > 0,
-                            canMoveDown: index < assessments.count - 1,
-                            toggleCollapse: {
-                                toggleCollapsedLocation(assessment.location.id)
-                            },
-                            moveUp: {
-                                appModel.moveLocation(id: assessment.location.id, offset: -1)
-                            },
-                            moveDown: {
-                                appModel.moveLocation(id: assessment.location.id, offset: 1)
-                            },
-                            edit: { editingLocation = assessment.location },
-                            delete: { deletingLocation = assessment.location }
-                        )
+                    ForEach(assessments) { assessment in
+                        reorderableLocationCard(assessment)
                     }
                     DisclaimerView()
                 }
@@ -149,6 +134,41 @@ struct DashboardView: View {
             } else {
                 collapsedLocationIDs.insert(id)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func reorderableLocationCard(_ assessment: LocationAssessment) -> some View {
+        let card = LocationRiskCard(
+            locationAssessment: assessment,
+            isCollapsed: isReordering || collapsedLocationIDs.contains(assessment.location.id),
+            isReordering: isReordering,
+            toggleCollapse: {
+                toggleCollapsedLocation(assessment.location.id)
+            },
+            edit: { editingLocation = assessment.location },
+            delete: { deletingLocation = assessment.location }
+        )
+
+        if isReordering {
+            card
+                .opacity(draggingLocationID == assessment.location.id ? 0.45 : 1)
+                .onDrag {
+                    draggingLocationID = assessment.location.id
+                    return NSItemProvider(object: assessment.location.id.uuidString as NSString)
+                }
+                .onDrop(
+                    of: [UTType.text],
+                    delegate: LocationReorderDropDelegate(
+                        targetID: assessment.location.id,
+                        draggingLocationID: $draggingLocationID,
+                        moveLocation: { draggedID, targetID in
+                            appModel.moveLocation(id: draggedID, toTarget: targetID)
+                        }
+                    )
+                )
+        } else {
+            card
         }
     }
 }
@@ -182,11 +202,7 @@ private struct LocationRiskCard: View {
     var locationAssessment: LocationAssessment
     var isCollapsed: Bool
     var isReordering: Bool
-    var canMoveUp: Bool
-    var canMoveDown: Bool
     var toggleCollapse: () -> Void
-    var moveUp: () -> Void
-    var moveDown: () -> Void
     var edit: () -> Void
     var delete: () -> Void
 
@@ -223,23 +239,11 @@ private struct LocationRiskCard: View {
                 VStack(alignment: .trailing, spacing: 8) {
                     RiskBadge(level: assessment.level)
                     if isReordering {
-                        HStack(spacing: 8) {
-                            Button(action: moveUp) {
-                                Image(systemName: "arrow.up")
-                                    .frame(width: 34, height: 34)
-                            }
-                            .disabled(!canMoveUp)
-                            .accessibilityLabel("Move \(location.name) up")
-
-                            Button(action: moveDown) {
-                                Image(systemName: "arrow.down")
-                                    .frame(width: 34, height: 34)
-                            }
-                            .disabled(!canMoveDown)
-                            .accessibilityLabel("Move \(location.name) down")
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                        Image(systemName: "line.3.horizontal")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 36, height: 36)
+                            .accessibilityLabel("Drag \(location.name) to reorder")
                     } else {
                         Menu {
                             Button {
@@ -310,6 +314,33 @@ private struct LocationRiskCard: View {
             return "None"
         }
         return "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
+    }
+}
+
+private struct LocationReorderDropDelegate: DropDelegate {
+    let targetID: UUID
+    @Binding var draggingLocationID: UUID?
+    let moveLocation: (UUID, UUID) -> Void
+
+    func dropEntered(info: DropInfo) {
+        guard let draggingLocationID, draggingLocationID != targetID else { return }
+        withAnimation(.snappy) {
+            moveLocation(draggingLocationID, targetID)
+        }
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggingLocationID = nil
+        return true
+    }
+
+    func dropExited(info: DropInfo) {
+        guard !info.hasItemsConforming(to: [UTType.text]) else { return }
+        draggingLocationID = nil
     }
 }
 

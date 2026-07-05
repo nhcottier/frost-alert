@@ -121,6 +121,22 @@ final class AppModel: ObservableObject {
         saveLocations()
     }
 
+    func moveLocation(id: UUID, toTarget targetID: UUID) {
+        guard id != targetID,
+              let currentIndex = locations.firstIndex(where: { $0.id == id }),
+              let targetIndex = locations.firstIndex(where: { $0.id == targetID })
+        else { return }
+
+        locations.moveItem(from: currentIndex, toTarget: targetIndex)
+        if case .loaded(var assessments) = state,
+           let currentAssessmentIndex = assessments.firstIndex(where: { $0.location.id == id }),
+           let targetAssessmentIndex = assessments.firstIndex(where: { $0.location.id == targetID }) {
+            assessments.moveItem(from: currentAssessmentIndex, toTarget: targetAssessmentIndex)
+            state = .loaded(assessments)
+        }
+        saveLocations()
+    }
+
     private func loadSavedLocations() -> [GrowingLocation] {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return [] }
         return (try? JSONDecoder().decode([GrowingLocation].self, from: data)) ?? []
@@ -157,5 +173,15 @@ final class AppModel: ObservableObject {
             return "Apple Weather is not ready to provide forecasts yet. Try again in a few minutes."
         }
         return message
+    }
+}
+
+private extension Array {
+    mutating func moveItem(from currentIndex: Index, toTarget targetIndex: Index) {
+        guard currentIndex != targetIndex else { return }
+
+        let item = remove(at: currentIndex)
+        let insertionIndex = targetIndex > currentIndex ? targetIndex + 1 : targetIndex
+        insert(item, at: Swift.min(insertionIndex, count))
     }
 }
