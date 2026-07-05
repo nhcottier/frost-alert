@@ -8,6 +8,8 @@ struct DashboardView: View {
     @State private var showingAddLocation = false
     @State private var editingLocation: GrowingLocation?
     @State private var deletingLocation: GrowingLocation?
+    @State private var collapsedLocationIDs: Set<UUID> = []
+    @State private var isReordering = false
 
     var body: some View {
         NavigationStack {
@@ -17,6 +19,18 @@ struct DashboardView: View {
             }
             .navigationTitle("Frost Alert")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if canReorderLocations {
+                        Button(isReordering ? "Done" : "Reorder") {
+                            withAnimation(.snappy) {
+                                isReordering.toggle()
+                                if isReordering {
+                                    collapsedLocationIDs = Set(appModel.locations.map(\.id))
+                                }
+                            }
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showingAddLocation = true
@@ -51,6 +65,10 @@ struct DashboardView: View {
             .alert("Delete location?", isPresented: deleteConfirmationBinding, presenting: deletingLocation) { location in
                 Button("Delete", role: .destructive) {
                     appModel.deleteLocation(id: location.id)
+                    collapsedLocationIDs.remove(location.id)
+                    if appModel.locations.count < 2 {
+                        isReordering = false
+                    }
                     Task { await appModel.load() }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -58,6 +76,13 @@ struct DashboardView: View {
                 Text("This removes \(location.name) and its scheduled frost alerts.")
             }
         }
+    }
+
+    private var canReorderLocations: Bool {
+        if case .loaded(let assessments) = appModel.state {
+            return assessments.count > 1
+        }
+        return false
     }
 
     private var deleteConfirmationBinding: Binding<Bool> {
@@ -89,9 +114,22 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     NotificationPermissionBanner()
                     DashboardHeader(assessments: assessments)
-                    ForEach(assessments) { assessment in
+                    ForEach(Array(assessments.enumerated()), id: \.element.id) { index, assessment in
                         LocationRiskCard(
                             locationAssessment: assessment,
+                            isCollapsed: isReordering || collapsedLocationIDs.contains(assessment.location.id),
+                            isReordering: isReordering,
+                            canMoveUp: index > 0,
+                            canMoveDown: index < assessments.count - 1,
+                            toggleCollapse: {
+                                toggleCollapsedLocation(assessment.location.id)
+                            },
+                            moveUp: {
+                                appModel.moveLocation(id: assessment.location.id, offset: -1)
+                            },
+                            moveDown: {
+                                appModel.moveLocation(id: assessment.location.id, offset: 1)
+                            },
                             edit: { editingLocation = assessment.location },
                             delete: { deletingLocation = assessment.location }
                         )
@@ -100,6 +138,16 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 16)
+            }
+        }
+    }
+
+    private func toggleCollapsedLocation(_ id: UUID) {
+        withAnimation(.snappy) {
+            if collapsedLocationIDs.contains(id) {
+                collapsedLocationIDs.remove(id)
+            } else {
+                collapsedLocationIDs.insert(id)
             }
         }
     }
@@ -132,6 +180,13 @@ private struct DashboardHeader: View {
 
 private struct LocationRiskCard: View {
     var locationAssessment: LocationAssessment
+    var isCollapsed: Bool
+    var isReordering: Bool
+    var canMoveUp: Bool
+    var canMoveDown: Bool
+    var toggleCollapse: () -> Void
+    var moveUp: () -> Void
+    var moveDown: () -> Void
     var edit: () -> Void
     var delete: () -> Void
 
@@ -141,6 +196,15 @@ private struct LocationRiskCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 12) {
+                Button(action: toggleCollapse) {
+                    Image(systemName: isCollapsed ? "chevron.right.circle" : "chevron.down.circle")
+                        .font(.title3)
+                        .foregroundStyle(FrostPalette.blue)
+                        .frame(width: 32, height: 32)
+                }
+                .accessibilityLabel(isCollapsed ? "Expand \(location.name)" : "Collapse \(location.name)")
+                .disabled(isReordering)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(location.name)
                         .font(.title3.weight(.semibold))
@@ -148,60 +212,88 @@ private struct LocationRiskCard: View {
                     Text("\(location.crop) - \(location.sensitivity.name)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    if isCollapsed {
+                        Text("Low \(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C | Frost: \(frostPeriodText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 Spacer(minLength: 12)
                 VStack(alignment: .trailing, spacing: 8) {
                     RiskBadge(level: assessment.level)
-                    Menu {
-                        Button {
-                            edit()
-                        } label: {
-                            Label("Edit location", systemImage: "pencil")
+                    if isReordering {
+                        HStack(spacing: 8) {
+                            Button(action: moveUp) {
+                                Image(systemName: "arrow.up")
+                                    .frame(width: 34, height: 34)
+                            }
+                            .disabled(!canMoveUp)
+                            .accessibilityLabel("Move \(location.name) up")
+
+                            Button(action: moveDown) {
+                                Image(systemName: "arrow.down")
+                                    .frame(width: 34, height: 34)
+                            }
+                            .disabled(!canMoveDown)
+                            .accessibilityLabel("Move \(location.name) down")
                         }
-                        Button(role: .destructive) {
-                            delete()
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    } else {
+                        Menu {
+                            Button {
+                                edit()
+                            } label: {
+                                Label("Edit location", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) {
+                                delete()
+                            } label: {
+                                Label("Delete location", systemImage: "trash")
+                            }
                         } label: {
-                            Label("Delete location", systemImage: "trash")
+                            Image(systemName: "ellipsis.circle")
+                                .font(.title3)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 36, height: 36)
                         }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 36, height: 36)
+                        .accessibilityLabel("Location options")
                     }
-                    .accessibilityLabel("Location options")
                 }
             }
 
-            VStack(alignment: .leading, spacing: 10) {
-                MetricRow(icon: "thermometer.low", label: "Expected low", value: "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
-                MetricRow(icon: "clock", label: "Frost forecast period", value: frostPeriodText)
-                MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
-            }
-
-            ThreeDayOutlookView(outlook: locationAssessment.outlook)
-
-            Text(assessment.summary)
-                .font(.body)
-                .foregroundStyle(FrostPalette.ink)
-                .fixedSize(horizontal: false, vertical: true)
-
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(assessment.actions, id: \.self) { action in
-                    Label(action, systemImage: "checkmark.circle")
-                        .font(.subheadline)
-                        .foregroundStyle(FrostPalette.ink.opacity(0.86))
+            if !isCollapsed {
+                VStack(alignment: .leading, spacing: 10) {
+                    MetricRow(icon: "thermometer.low", label: "Expected low", value: "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
+                    MetricRow(icon: "clock", label: "Frost forecast period", value: frostPeriodText)
+                    MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
                 }
-            }
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Why")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.secondary)
-                ForEach(assessment.drivers, id: \.self) { driver in
-                    Text(driver)
-                        .font(.caption)
+                ThreeDayOutlookView(outlook: locationAssessment.outlook)
+
+                Text(assessment.summary)
+                    .font(.body)
+                    .foregroundStyle(FrostPalette.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(assessment.actions, id: \.self) { action in
+                        Label(action, systemImage: "checkmark.circle")
+                            .font(.subheadline)
+                            .foregroundStyle(FrostPalette.ink.opacity(0.86))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Why")
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
+                    ForEach(assessment.drivers, id: \.self) { driver in
+                        Text(driver)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }

@@ -46,7 +46,7 @@ final class AppModel: ObservableObject {
                 assessments.append(LocationAssessment(location: location, assessment: assessment, outlook: outlook))
                 scheduledAssessments.append(contentsOf: outlook)
             }
-            state = .loaded(assessments.sorted { $0.assessment.level.sortOrder > $1.assessment.level.sortOrder })
+            state = .loaded(assessments)
             await notifications.refreshAuthorizationStatus()
             await notifications.scheduleAlerts(for: scheduledAssessments)
         } catch {
@@ -100,6 +100,24 @@ final class AppModel: ObservableObject {
     func deleteLocation(id: UUID) {
         locations.removeAll { $0.id == id }
         notifications.cancelAlerts(for: id)
+        saveLocations()
+    }
+
+    func moveLocation(id: UUID, offset: Int) {
+        guard offset != 0,
+              let currentIndex = locations.firstIndex(where: { $0.id == id })
+        else { return }
+
+        let newIndex = currentIndex + offset
+        guard locations.indices.contains(newIndex) else { return }
+
+        locations.swapAt(currentIndex, newIndex)
+        if case .loaded(var assessments) = state,
+           let currentAssessmentIndex = assessments.firstIndex(where: { $0.location.id == id }),
+           assessments.indices.contains(currentAssessmentIndex + offset) {
+            assessments.swapAt(currentAssessmentIndex, currentAssessmentIndex + offset)
+            state = .loaded(assessments)
+        }
         saveLocations()
     }
 
