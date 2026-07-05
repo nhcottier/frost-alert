@@ -33,6 +33,16 @@ final class FrostRiskCalculatorTests: XCTestCase {
         XCTAssertNil(assessment.likelyStart)
     }
 
+    func testWatchRiskWhenConditionsAreFrostyButNoFrostPeriodIsForecast() {
+        let location = GrowingLocation(name: "Home", subtitle: "Garden", crop: "Sensitive plants", sensitivity: .sensitive)
+        let forecast = forecast(locationID: location.id, low: 4.7, wind: 2, cloud: 8, humidity: 94)
+
+        let assessment = FrostRiskCalculator().assess(location: location, forecast: forecast, now: Date.fixedNoon)
+
+        XCTAssertEqual(assessment.level, .watch)
+        XCTAssertNil(assessment.likelyStart)
+    }
+
     private func forecast(locationID: UUID, low: Double, wind: Double, cloud: Double, humidity: Double) -> LocationForecast {
         let calendar = Calendar.current
         let start = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: Date.fixedNoon)!

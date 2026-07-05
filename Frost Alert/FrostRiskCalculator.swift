@@ -43,6 +43,9 @@ struct FrostRiskCalculator {
         score += min(8, dryPrecipHours)
         if !riskyHours.isEmpty { score += 12 }
         score = min(score, 100)
+        if riskyHours.isEmpty {
+            score = min(score, 49)
+        }
 
         let level: FrostRiskLevel
         switch score {
