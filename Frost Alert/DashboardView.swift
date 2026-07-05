@@ -10,6 +10,7 @@ struct DashboardView: View {
     @State private var editingLocation: GrowingLocation?
     @State private var deletingLocation: GrowingLocation?
     @State private var collapsedLocationIDs: Set<UUID> = []
+    @State private var didApplyInitialCollapse = false
     @State private var isReordering = false
     @State private var draggingLocationID: UUID?
 
@@ -124,7 +125,16 @@ struct DashboardView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 16)
             }
+            .onAppear {
+                collapseLoadedLocationsIfNeeded(assessments)
+            }
         }
+    }
+
+    private func collapseLoadedLocationsIfNeeded(_ assessments: [LocationAssessment]) {
+        guard !didApplyInitialCollapse else { return }
+        collapsedLocationIDs = Set(assessments.map(\.location.id))
+        didApplyInitialCollapse = true
     }
 
     private func toggleCollapsedLocation(_ id: UUID) {
