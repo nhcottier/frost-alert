@@ -102,6 +102,7 @@ struct LocationAssessment: Identifiable, Equatable {
     var id: UUID { location.id }
     var location: GrowingLocation
     var assessment: FrostRiskAssessment
+    var outlook: [ScheduledLocationAssessment] = []
 }
 
 struct ScheduledLocationAssessment: Identifiable, Equatable {

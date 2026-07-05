@@ -45,8 +45,9 @@ final class AppModel: ObservableObject {
             for location in locations {
                 let forecast = try await provider.forecast(for: location)
                 let assessment = calculator.assess(location: location, forecast: forecast)
-                assessments.append(LocationAssessment(location: location, assessment: assessment))
-                scheduledAssessments.append(contentsOf: alertAssessments(location: location, forecast: forecast))
+                let outlook = alertAssessments(location: location, forecast: forecast)
+                assessments.append(LocationAssessment(location: location, assessment: assessment, outlook: outlook))
+                scheduledAssessments.append(contentsOf: outlook)
             }
             state = .loaded(assessments.sorted { $0.assessment.level.sortOrder > $1.assessment.level.sortOrder })
             await notifications.refreshAuthorizationStatus()
@@ -68,9 +69,7 @@ final class AppModel: ObservableObject {
 
     private func scheduleNotificationsIfLoaded() async {
         guard case .loaded(let assessments) = state else { return }
-        await notifications.scheduleAlerts(for: assessments.map {
-            ScheduledLocationAssessment(location: $0.location, assessment: $0.assessment, nightStart: Date())
-        })
+        await notifications.scheduleAlerts(for: assessments.flatMap(\.outlook))
     }
 
     func addLocation(name: String, crop: String, sensitivity: PlantSensitivity, searchResult: LocationSearchResult) {

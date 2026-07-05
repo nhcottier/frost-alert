@@ -179,6 +179,8 @@ private struct LocationRiskCard: View {
                 MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
             }
 
+            ThreeDayOutlookView(outlook: locationAssessment.outlook)
+
             Text(assessment.summary)
                 .font(.body)
                 .foregroundStyle(FrostPalette.ink)
@@ -216,6 +218,74 @@ private struct LocationRiskCard: View {
             return "None"
         }
         return "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
+    }
+}
+
+private struct ThreeDayOutlookView: View {
+    var outlook: [ScheduledLocationAssessment]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("3-day frost outlook")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 8) {
+                ForEach(outlook.prefix(3)) { assessment in
+                    OutlookRow(assessment: assessment)
+                }
+            }
+        }
+        .padding(12)
+        .background(FrostPalette.background, in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct OutlookRow: View {
+    var assessment: ScheduledLocationAssessment
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(nightLabel)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(FrostPalette.ink)
+                Text(detailText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Text(assessment.assessment.level.rawValue)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(assessment.assessment.level.color)
+                .multilineTextAlignment(.trailing)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var nightLabel: String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(assessment.nightStart) {
+            return "Tonight"
+        }
+        if calendar.isDateInTomorrow(assessment.nightStart) {
+            return "Tomorrow night"
+        }
+        return assessment.nightStart.formatted(.dateTime.weekday(.wide)) + " night"
+    }
+
+    private var detailText: String {
+        let low = assessment.assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))
+        return "Low \(low) C | Frost: \(frostPeriodText)"
+    }
+
+    private var frostPeriodText: String {
+        guard let start = assessment.assessment.likelyStart, let end = assessment.assessment.likelyEnd else {
+            return "None"
+        }
+        return "\(start.formatted(date: .omitted, time: .shortened))-\(end.formatted(date: .omitted, time: .shortened))"
     }
 }
 
