@@ -235,6 +235,12 @@ private struct LocationRiskCard: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    guard !isReordering else { return }
+                    toggleCollapse()
+                }
                 Spacer(minLength: 12)
                 VStack(alignment: .trailing, spacing: 8) {
                     RiskBadge(level: assessment.level)
