@@ -20,10 +20,9 @@ struct FrostRiskCalculator {
         let threshold = location.sensitivity.thresholdCelsius
         let minimumHour = relevantHours.min { effectiveTemperature($0) < effectiveTemperature($1) }!
         let minimumTemperature = effectiveTemperature(minimumHour)
-        let riskyHours = relevantHours.filter { hour in
-            let temperatureRisk = effectiveTemperature(hour) <= threshold + 1.5
-            let frostWeather = hour.windKph <= 12 && hour.cloudCover <= 65
-            return temperatureRisk && frostWeather
+        let coldHours = relevantHours.filter { effectiveTemperature($0) <= threshold }
+        let frostFormationHours = coldHours.filter { hour in
+            hour.windKph <= 12 && hour.cloudCover <= 65
         }
 
         var score = 0
@@ -41,9 +40,9 @@ struct FrostRiskCalculator {
         score += min(14, clearHours * 2)
         score += min(12, humidHours * 2)
         score += min(8, dryPrecipHours)
-        if !riskyHours.isEmpty { score += 12 }
+        if !frostFormationHours.isEmpty { score += 12 }
         score = min(score, 100)
-        if riskyHours.isEmpty {
+        if coldHours.isEmpty {
             score = min(score, 49)
         }
 
@@ -59,8 +58,8 @@ struct FrostRiskCalculator {
             level: level,
             score: score,
             minimumTemperatureCelsius: minimumTemperature,
-            likelyStart: riskyHours.first?.date,
-            likelyEnd: riskyHours.last?.date,
+            likelyStart: coldHours.first?.date,
+            likelyEnd: coldHours.last?.date,
             summary: summary(for: level, location: location, minimumTemperature: minimumTemperature, threshold: threshold),
             drivers: drivers(for: relevantHours, minimumTemperature: minimumTemperature, threshold: threshold),
             actions: actions(for: level, sensitivity: location.sensitivity)
