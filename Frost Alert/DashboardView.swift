@@ -257,7 +257,7 @@ private struct Banner: View {
 
 private struct DisclaimerView: View {
     var body: some View {
-        Text("Forecasts are guidance only. For high-value crops, use local sensors and professional frost systems as needed.")
+        Text("Forecasts are guidance only. Weather data may come from Apple Weather or Open-Meteo. For high-value crops, use local sensors and professional frost systems as needed.")
             .font(.footnote)
             .foregroundStyle(.secondary)
             .padding(14)
