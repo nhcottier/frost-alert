@@ -16,12 +16,15 @@ final class AppModel: ObservableObject {
 
     private let calculator = FrostRiskCalculator()
     private let storageKey = "savedGrowingLocations"
+    private let notificationPromptKey = "didRequestNotificationPermission"
 
     init() {
         locations = loadSavedLocations()
     }
 
     func load() async {
+        await requestNotificationPermissionIfNeeded()
+
         guard !locations.isEmpty else {
             state = .empty
             return
@@ -47,6 +50,21 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func requestNotificationPermission() async {
+        await notifications.requestPermission()
+        await scheduleNotificationsIfLoaded()
+    }
+
+    func refreshNotificationPermission() async {
+        await notifications.refreshAuthorizationStatus()
+        await scheduleNotificationsIfLoaded()
+    }
+
+    private func scheduleNotificationsIfLoaded() async {
+        guard case .loaded(let assessments) = state else { return }
+        await notifications.scheduleAlerts(for: assessments)
+    }
+
     func addLocation(name: String, crop: String, sensitivity: PlantSensitivity, searchResult: LocationSearchResult) {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanCrop = crop.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -70,6 +88,15 @@ final class AppModel: ObservableObject {
     private func saveLocations() {
         guard let data = try? JSONEncoder().encode(locations) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)
+    }
+
+    private func requestNotificationPermissionIfNeeded() async {
+        await notifications.refreshAuthorizationStatus()
+        guard notifications.authorizationStatus == .notDetermined else { return }
+        guard !UserDefaults.standard.bool(forKey: notificationPromptKey) else { return }
+
+        UserDefaults.standard.set(true, forKey: notificationPromptKey)
+        await requestNotificationPermission()
     }
 
     private func userFacingForecastError(_ error: Error) -> String {

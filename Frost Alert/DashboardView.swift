@@ -1,8 +1,10 @@
 import SwiftUI
+import UIKit
 import UserNotifications
 
 struct DashboardView: View {
     @EnvironmentObject private var appModel: AppModel
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showingAddLocation = false
 
     var body: some View {
@@ -27,6 +29,10 @@ struct DashboardView: View {
             }
             .refreshable {
                 await appModel.load()
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else { return }
+                Task { await appModel.refreshNotificationPermission() }
             }
             .sheet(isPresented: $showingAddLocation) {
                 AddLocationView { name, crop, sensitivity, result in
@@ -197,17 +203,21 @@ private struct MetricRow: View {
 
 private struct NotificationPermissionBanner: View {
     @EnvironmentObject private var appModel: AppModel
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         switch appModel.notifications.authorizationStatus {
         case .denied:
             Banner(
                 icon: "bell.slash",
-                title: "Notifications are off",
-                message: "Frost warnings can only appear in the app until notifications are enabled in Settings.",
-                actionTitle: nil,
-                action: nil
-            )
+                title: "Frost alerts need notifications",
+                message: "Enable notifications so evening and morning warnings can reach you in time.",
+                actionTitle: "Allow"
+            ) {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(settingsURL)
+                }
+            }
         case .notDetermined:
             Banner(
                 icon: "bell.badge",
@@ -215,7 +225,7 @@ private struct NotificationPermissionBanner: View {
                 message: "Local notifications are scheduled on device when risk is watch or higher.",
                 actionTitle: "Allow"
             ) {
-                Task { await appModel.notifications.requestPermission() }
+                Task { await appModel.requestNotificationPermission() }
             }
         default:
             EmptyView()
