@@ -29,8 +29,8 @@ struct DashboardView: View {
                 await appModel.load()
             }
             .sheet(isPresented: $showingAddLocation) {
-                AddLocationView { name, crop, sensitivity in
-                    appModel.addLocation(name: name, crop: crop, sensitivity: sensitivity)
+                AddLocationView { name, crop, sensitivity, result in
+                    appModel.addLocation(name: name, crop: crop, sensitivity: sensitivity, searchResult: result)
                     Task { await appModel.load() }
                 }
             }
@@ -324,18 +324,71 @@ private struct ErrorStateView: View {
 private struct AddLocationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
+    @State private var locationQuery = ""
     @State private var crop = ""
     @State private var sensitivity = SensitivityOption.sensitive
     @State private var customThreshold = 1.0
+    @State private var searchResults: [LocationSearchResult] = []
+    @State private var selectedResult: LocationSearchResult?
+    @State private var isSearching = false
+    @State private var errorMessage: String?
 
-    var onSave: (String, String, PlantSensitivity) -> Void
+    private let searchService = LocationSearchService()
+
+    var onSave: (String, String, PlantSensitivity, LocationSearchResult) -> Void
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Location") {
-                    TextField("Name", text: $name)
+                    TextField("Growing area name", text: $name)
                         .textInputAutocapitalization(.words)
+                    TextField("Town, address, vineyard, or orchard", text: $locationQuery)
+                        .textInputAutocapitalization(.words)
+                        .submitLabel(.search)
+                        .onSubmit {
+                            Task { await search() }
+                        }
+                    Button {
+                        Task { await search() }
+                    } label: {
+                        if isSearching {
+                            Label("Searching", systemImage: "magnifyingglass")
+                        } else {
+                            Label("Find location", systemImage: "location.magnifyingglass")
+                        }
+                    }
+                    .disabled(isSearching)
+
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+
+                    ForEach(searchResults) { result in
+                        Button {
+                            selectedResult = result
+                            if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                name = result.name
+                            }
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: selectedResult == result ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(selectedResult == result ? FrostPalette.green : .secondary)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(result.name)
+                                        .foregroundStyle(FrostPalette.ink)
+                                    Text(result.subtitle.isEmpty ? "Matched location" : result.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Section("Plants") {
                     TextField("Crop or plants", text: $crop)
                         .textInputAutocapitalization(.words)
                 }
@@ -361,11 +414,33 @@ private struct AddLocationView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        onSave(name, crop, plantSensitivity)
-                        dismiss()
+                        if let selectedResult {
+                            onSave(name, crop, plantSensitivity, selectedResult)
+                            dismiss()
+                        }
                     }
+                    .disabled(selectedResult == nil)
                 }
             }
+        }
+    }
+
+    private func search() async {
+        isSearching = true
+        errorMessage = nil
+        defer { isSearching = false }
+
+        do {
+            let results = try await searchService.search(locationQuery)
+            searchResults = results
+            selectedResult = results.first
+            if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let first = results.first {
+                name = first.name
+            }
+        } catch {
+            searchResults = []
+            selectedResult = nil
+            errorMessage = error.localizedDescription
         }
     }
 

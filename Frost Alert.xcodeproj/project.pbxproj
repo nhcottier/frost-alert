@@ -12,6 +12,7 @@
 		278171EA6F7BFAEF85051F9F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61AF54702C9B25968C1E7E /* Models.swift */; };
 		55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5077C258B1F292F1AA43FC /* DashboardView.swift */; };
 		840D186585E69573B6A27BEC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4703A62EFB4A3126B4135CAE /* AppModel.swift */; };
+		92546D88437D42E62F44A3DA /* LocationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A38D70C9E42744C192E29D /* LocationSearchService.swift */; };
 		92904C50D43CCC3825E92B17 /* FrostRiskCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */; };
 		D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FC4FAC1F54BA51891E370E /* NotificationService.swift */; };
 		E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BA18A84370C80E66640DDB /* FrostAlertApp.swift */; };
@@ -37,9 +38,11 @@
 		58747715F755AB734D76BA9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		83BA18A84370C80E66640DDB /* FrostAlertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostAlertApp.swift; sourceTree = "<group>"; };
 		885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Frost Alert.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		98A38D70C9E42744C192E29D /* LocationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchService.swift; sourceTree = "<group>"; };
 		AB61AF54702C9B25968C1E7E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		AD833F95EDAE0AADA79C18AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostRiskCalculatorTests.swift; sourceTree = "<group>"; };
+		F12DDA6C1E5E05891847604E /* FrostAlert.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FrostAlert.entitlements; sourceTree = "<group>"; };
 		FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -59,9 +62,11 @@
 				4703A62EFB4A3126B4135CAE /* AppModel.swift */,
 				AD833F95EDAE0AADA79C18AF /* Assets.xcassets */,
 				1E5077C258B1F292F1AA43FC /* DashboardView.swift */,
+				F12DDA6C1E5E05891847604E /* FrostAlert.entitlements */,
 				83BA18A84370C80E66640DDB /* FrostAlertApp.swift */,
 				0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */,
 				58747715F755AB734D76BA9F /* Info.plist */,
+				98A38D70C9E42744C192E29D /* LocationSearchService.swift */,
 				AB61AF54702C9B25968C1E7E /* Models.swift */,
 				03FC4FAC1F54BA51891E370E /* NotificationService.swift */,
 				FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */,
@@ -190,6 +195,7 @@
 				55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */,
 				E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */,
 				129FB85302FC054446D339A5 /* FrostRiskCalculator.swift in Sources */,
+				92546D88437D42E62F44A3DA /* LocationSearchService.swift in Sources */,
 				278171EA6F7BFAEF85051F9F /* Models.swift in Sources */,
 				D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */,
 				F5C7B4D2962ABCA12B99681D /* WeatherProvider.swift in Sources */,
@@ -211,6 +217,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Frost Alert/FrostAlert.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Frost Alert/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Frost Alert";
@@ -231,6 +238,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Frost Alert/FrostAlert.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Frost Alert/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Frost Alert";

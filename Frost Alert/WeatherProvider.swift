@@ -1,4 +1,6 @@
+import CoreLocation
 import Foundation
+import WeatherKit
 
 protocol WeatherProviding {
     func forecast(for location: GrowingLocation) async throws -> LocationForecast
@@ -6,11 +8,39 @@ protocol WeatherProviding {
 
 enum WeatherProviderError: LocalizedError {
     case unavailable
+    case missingCoordinate
 
     var errorDescription: String? {
         switch self {
         case .unavailable: "Forecast data is temporarily unavailable."
+        case .missingCoordinate: "This location needs coordinates before a forecast can be loaded."
         }
+    }
+}
+
+struct WeatherKitProvider: WeatherProviding {
+    private let service = WeatherService.shared
+
+    func forecast(for location: GrowingLocation) async throws -> LocationForecast {
+        guard let coordinate = location.coordinate else {
+            throw WeatherProviderError.missingCoordinate
+        }
+
+        let hourly = try await service.weather(for: coordinate.clLocation, including: .hourly)
+        let convertedHours = hourly.forecast.map { hour in
+            HourlyForecast(
+                date: hour.date,
+                temperatureCelsius: hour.temperature.converted(to: .celsius).value,
+                feelsLikeCelsius: hour.apparentTemperature.converted(to: .celsius).value,
+                humidity: hour.humidity * 100,
+                dewPointCelsius: hour.dewPoint.converted(to: .celsius).value,
+                windKph: hour.wind.speed.converted(to: .kilometersPerHour).value,
+                cloudCover: hour.cloudCover * 100,
+                precipitationProbability: hour.precipitationChance * 100
+            )
+        }
+
+        return LocationForecast(locationID: location.id, generatedAt: Date(), hourly: convertedHours)
     }
 }
 
@@ -55,4 +85,3 @@ struct MockWeatherProvider: WeatherProviding {
         return LocationForecast(locationID: location.id, generatedAt: now, hourly: hours)
     }
 }
-

@@ -16,6 +16,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nickcottier.frostalert
+        CODE_SIGN_ENTITLEMENTS: Frost Alert/FrostAlert.entitlements
         INFOPLIST_KEY_CFBundleDisplayName: Frost Alert
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
@@ -27,6 +28,7 @@ targets:
       properties:
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
+        NSLocationWhenInUseUsageDescription: Frost Alert uses your location to find local Apple Weather forecasts for frost risk.
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UILaunchScreen: {}

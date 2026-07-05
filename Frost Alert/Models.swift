@@ -1,22 +1,34 @@
+import CoreLocation
 import Foundation
 
-struct GrowingLocation: Identifiable, Equatable {
+struct GrowingLocation: Identifiable, Codable, Equatable {
     let id: UUID
     var name: String
     var subtitle: String
     var crop: String
     var sensitivity: PlantSensitivity
+    var coordinate: LocationCoordinate?
 
-    init(id: UUID = UUID(), name: String, subtitle: String, crop: String, sensitivity: PlantSensitivity) {
+    init(id: UUID = UUID(), name: String, subtitle: String, crop: String, sensitivity: PlantSensitivity, coordinate: LocationCoordinate? = nil) {
         self.id = id
         self.name = name
         self.subtitle = subtitle
         self.crop = crop
         self.sensitivity = sensitivity
+        self.coordinate = coordinate
     }
 }
 
-enum PlantSensitivity: Equatable {
+struct LocationCoordinate: Codable, Equatable {
+    var latitude: Double
+    var longitude: Double
+
+    var clLocation: CLLocation {
+        CLLocation(latitude: latitude, longitude: longitude)
+    }
+}
+
+enum PlantSensitivity: Codable, Equatable {
     case hardy
     case sensitive
     case verySensitive
@@ -91,4 +103,3 @@ struct LocationAssessment: Identifiable, Equatable {
     var location: GrowingLocation
     var assessment: FrostRiskAssessment
 }
-

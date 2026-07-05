@@ -9,16 +9,17 @@ enum DashboardState: Equatable {
 
 @MainActor
 final class AppModel: ObservableObject {
-    @Published var locations: [GrowingLocation] = [
-        GrowingLocation(name: "North Block Vineyard", subtitle: "Lower terrace", crop: "Pinot noir vines", sensitivity: .sensitive),
-        GrowingLocation(name: "Kitchen Garden", subtitle: "Raised beds", crop: "Seedlings and tomatoes", sensitivity: .verySensitive),
-        GrowingLocation(name: "Glasshouse Bench", subtitle: "Propagation area", crop: "Citrus and chillies", sensitivity: .custom(2))
-    ]
+    @Published var locations: [GrowingLocation] = []
     @Published private(set) var state: DashboardState = .loading
 
     let notifications = NotificationService()
 
     private let calculator = FrostRiskCalculator()
+    private let storageKey = "savedGrowingLocations"
+
+    init() {
+        locations = loadSavedLocations()
+    }
 
     func load() async {
         guard !locations.isEmpty else {
@@ -28,7 +29,7 @@ final class AppModel: ObservableObject {
 
         state = .loading
         do {
-            let provider = MockWeatherProvider()
+            let provider = WeatherKitProvider()
             var assessments: [LocationAssessment] = []
             for location in locations {
                 let forecast = try await provider.forecast(for: location)
@@ -43,16 +44,28 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func addLocation(name: String, crop: String, sensitivity: PlantSensitivity) {
+    func addLocation(name: String, crop: String, sensitivity: PlantSensitivity, searchResult: LocationSearchResult) {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanCrop = crop.trimmingCharacters(in: .whitespacesAndNewlines)
         locations.append(
             GrowingLocation(
-                name: cleanName.isEmpty ? "New growing area" : cleanName,
-                subtitle: "Custom location",
+                name: cleanName.isEmpty ? searchResult.name : cleanName,
+                subtitle: searchResult.subtitle,
                 crop: cleanCrop.isEmpty ? "Sensitive plants" : cleanCrop,
-                sensitivity: sensitivity
+                sensitivity: sensitivity,
+                coordinate: searchResult.coordinate
             )
         )
+        saveLocations()
+    }
+
+    private func loadSavedLocations() -> [GrowingLocation] {
+        guard let data = UserDefaults.standard.data(forKey: storageKey) else { return [] }
+        return (try? JSONDecoder().decode([GrowingLocation].self, from: data)) ?? []
+    }
+
+    private func saveLocations() {
+        guard let data = try? JSONEncoder().encode(locations) else { return }
+        UserDefaults.standard.set(data, forKey: storageKey)
     }
 }
