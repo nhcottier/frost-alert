@@ -213,7 +213,7 @@ private struct LocationRiskCard: View {
 
     private var frostPeriodText: String {
         guard let start = assessment.likelyStart, let end = assessment.likelyEnd else {
-            return "No frost period forecast"
+            return "None"
         }
         return "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
     }
