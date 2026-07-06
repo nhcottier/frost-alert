@@ -4,6 +4,7 @@ import UserNotifications
 @MainActor
 final class NotificationService: ObservableObject {
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
+    private let notificationPrefix = "frostalert"
 
     func refreshAuthorizationStatus() async {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
@@ -22,13 +23,7 @@ final class NotificationService: ObservableObject {
     func scheduleAlerts(for assessments: [ScheduledLocationAssessment]) async {
         guard authorizationStatus == .authorized || authorizationStatus == .provisional else { return }
 
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: assessments.flatMap { assessment in
-            [
-                "evening-\(assessment.id)",
-                "morning-\(assessment.id)"
-            ]
-        })
+        await removeExistingFrostAlerts()
 
         for assessment in assessments where assessment.assessment.level.sortOrder >= FrostRiskLevel.watch.sortOrder {
             await scheduleEveningWarning(for: assessment)
@@ -47,6 +42,27 @@ final class NotificationService: ObservableObject {
         }
     }
 
+    private func removeExistingFrostAlerts() async {
+        let center = UNUserNotificationCenter.current()
+        let pendingIdentifiers = await center.pendingNotificationRequests()
+            .map(\.identifier)
+            .filter(isFrostAlertIdentifier)
+        center.removePendingNotificationRequests(withIdentifiers: pendingIdentifiers)
+
+        let deliveredIdentifiers = await center.deliveredNotifications()
+            .map(\.request.identifier)
+            .filter(isLegacyFrostAlertIdentifier)
+        center.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiers)
+    }
+
+    private func isFrostAlertIdentifier(_ identifier: String) -> Bool {
+        identifier.hasPrefix(notificationPrefix) || isLegacyFrostAlertIdentifier(identifier)
+    }
+
+    private func isLegacyFrostAlertIdentifier(_ identifier: String) -> Bool {
+        identifier.hasPrefix("evening-") || identifier.hasPrefix("morning-")
+    }
+
     private func scheduleEveningWarning(for assessment: ScheduledLocationAssessment) async {
         guard let trigger = notificationTrigger(for: assessment.nightStart, hour: 18, minute: 0) else { return }
 
@@ -55,7 +71,7 @@ final class NotificationService: ObservableObject {
         content.body = "Frost risk is possible \(nightLabel(for: assessment.nightStart)). \(assessment.assessment.summary)"
         content.sound = .default
 
-        let request = UNNotificationRequest(identifier: "evening-\(assessment.id)", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: notificationIdentifier(type: "evening", assessment: assessment), content: content, trigger: trigger)
         try? await UNUserNotificationCenter.current().add(request)
     }
 
@@ -67,8 +83,17 @@ final class NotificationService: ObservableObject {
         content.body = "Check protection before sunrise. Forecast low: \(assessment.assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C."
         content.sound = .default
 
-        let request = UNNotificationRequest(identifier: "morning-\(assessment.id)", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: notificationIdentifier(type: "morning", assessment: assessment), content: content, trigger: trigger)
         try? await UNUserNotificationCenter.current().add(request)
+    }
+
+    private func notificationIdentifier(type: String, assessment: ScheduledLocationAssessment) -> String {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: assessment.nightStart)
+        let year = components.year ?? 0
+        let month = components.month ?? 0
+        let day = components.day ?? 0
+        return "\(notificationPrefix).\(type).\(assessment.location.id.uuidString).\(year)-\(month)-\(day)"
     }
 
     private func notificationTrigger(for date: Date, dayOffset: Int = 0, hour: Int, minute: Int) -> UNCalendarNotificationTrigger? {

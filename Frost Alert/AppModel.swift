@@ -161,8 +161,11 @@ final class AppModel: ObservableObject {
         let now = Date()
 
         return (0..<3).compactMap { dayOffset in
-            guard let nightStart = calendar.date(byAdding: .day, value: dayOffset, to: now) else { return nil }
-            let assessment = calculator.assess(location: location, forecast: forecast, now: nightStart)
+            guard let targetDay = calendar.date(byAdding: .day, value: dayOffset, to: now),
+                  let nightStart = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: targetDay)
+            else { return nil }
+            let assessmentStart = dayOffset == 0 ? now : nightStart
+            let assessment = calculator.assess(location: location, forecast: forecast, now: assessmentStart)
             return ScheduledLocationAssessment(location: location, assessment: assessment, nightStart: nightStart)
         }
     }
