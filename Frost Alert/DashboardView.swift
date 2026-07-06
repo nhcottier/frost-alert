@@ -21,6 +21,7 @@ struct DashboardView: View {
                 content
             }
             .navigationTitle("Frost Alert")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if canReorderLocations {
@@ -33,6 +34,9 @@ struct DashboardView: View {
                             }
                         }
                     }
+                }
+                ToolbarItem(placement: .principal) {
+                    HeaderBrandView()
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -181,6 +185,47 @@ struct DashboardView: View {
         } else {
             card
         }
+    }
+}
+
+private struct HeaderBrandView: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            FrostMark(size: 28)
+            Text("Frost Alert")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(FrostPalette.ink)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Frost Alert")
+    }
+}
+
+private struct FrostMark: View {
+    var size: CGFloat
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.73, green: 0.88, blue: 1), FrostPalette.blue.opacity(0.82)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            Image(systemName: "snowflake")
+                .font(.system(size: size * 0.52, weight: .semibold))
+                .foregroundStyle(.white)
+                .shadow(color: FrostPalette.blue.opacity(0.35), radius: 1, x: 0, y: 1)
+        }
+        .frame(width: size, height: size)
+        .overlay {
+            RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
+                .stroke(.white.opacity(0.9), lineWidth: 1)
+        }
+        .shadow(color: FrostPalette.blue.opacity(0.18), radius: 5, x: 0, y: 2)
+        .accessibilityHidden(true)
     }
 }
 
