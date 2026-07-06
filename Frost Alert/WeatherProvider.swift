@@ -43,7 +43,15 @@ struct WeatherKitProvider: WeatherProviding {
             throw WeatherProviderError.missingCoordinate
         }
 
-        let hourly = try await service.weather(for: coordinate.clLocation, including: .hourly)
+        let startDate = Date()
+        guard let endDate = Calendar.current.date(byAdding: .day, value: 4, to: startDate) else {
+            throw WeatherProviderError.invalidResponse
+        }
+
+        let hourly = try await service.weather(
+            for: coordinate.clLocation,
+            including: .hourly(startDate: startDate, endDate: endDate)
+        )
         let convertedHours = hourly.forecast.map { hour in
             HourlyForecast(
                 date: hour.date,

@@ -2,8 +2,7 @@ import Foundation
 
 struct FrostRiskCalculator {
     func assess(location: GrowingLocation, forecast: LocationForecast, now: Date = Date()) -> FrostRiskAssessment {
-        let hours = overnightHours(from: forecast.hourly, now: now)
-        let relevantHours = hours.isEmpty ? forecast.hourly : hours
+        let relevantHours = overnightHours(from: forecast.hourly, now: now)
         guard !relevantHours.isEmpty else {
             return FrostRiskAssessment(
                 level: .safe,
