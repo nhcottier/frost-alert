@@ -53,6 +53,40 @@ final class FrostRiskCalculatorTests: XCTestCase {
         XCTAssertNotNil(assessment.likelyEnd)
     }
 
+    func testDifferentOutlookNightsUseDifferentOvernightWindows() {
+        let location = GrowingLocation(name: "Home", subtitle: "Garden", crop: "Grapes", sensitivity: .sensitive)
+        let forecast = multiNightForecast(locationID: location.id, lows: [5.9, 3.2, -1.0])
+        let calculator = FrostRiskCalculator()
+        let calendar = Calendar.current
+
+        let tonight = calculator.assess(location: location, forecast: forecast, now: Date.fixedNoon)
+        let tomorrow = calculator.assess(
+            location: location,
+            forecast: forecast,
+            now: calendar.date(byAdding: .day, value: 1, to: Date.fixedNoon)!
+        )
+        let thirdNight = calculator.assess(
+            location: location,
+            forecast: forecast,
+            now: calendar.date(byAdding: .day, value: 2, to: Date.fixedNoon)!
+        )
+
+        XCTAssertEqual(tonight.minimumTemperatureCelsius, 5.9, accuracy: 0.01)
+        XCTAssertEqual(tomorrow.minimumTemperatureCelsius, 3.2, accuracy: 0.01)
+        XCTAssertEqual(thirdNight.minimumTemperatureCelsius, -1.0, accuracy: 0.01)
+    }
+
+    func testNegativeLowCreatesFrostPeriodForSensitivePlants() {
+        let location = GrowingLocation(name: "Queenstown", subtitle: "Block", crop: "Sensitive plants", sensitivity: .sensitive)
+        let forecast = multiNightForecast(locationID: location.id, lows: [-1.0])
+
+        let assessment = FrostRiskCalculator().assess(location: location, forecast: forecast, now: Date.fixedNoon)
+
+        XCTAssertEqual(assessment.minimumTemperatureCelsius, -1.0, accuracy: 0.01)
+        XCTAssertNotNil(assessment.likelyStart)
+        XCTAssertNotNil(assessment.likelyEnd)
+    }
+
     private func forecast(locationID: UUID, low: Double, wind: Double, cloud: Double, humidity: Double) -> LocationForecast {
         let calendar = Calendar.current
         let start = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: Date.fixedNoon)!
@@ -71,6 +105,31 @@ final class FrostRiskCalculatorTests: XCTestCase {
                 precipitationProbability: 10
             )
         }
+        return LocationForecast(locationID: locationID, generatedAt: Date.fixedNoon, hourly: hours)
+    }
+
+    private func multiNightForecast(locationID: UUID, lows: [Double]) -> LocationForecast {
+        let calendar = Calendar.current
+        let hours = lows.enumerated().flatMap { dayOffset, low in
+            let targetNoon = calendar.date(byAdding: .day, value: dayOffset, to: Date.fixedNoon)!
+            let start = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: targetNoon)!
+            return (0..<16).map { hourOffset in
+                let date = calendar.date(byAdding: .hour, value: hourOffset, to: start)!
+                let curve = abs(Double(hourOffset) - 11) / 11
+                let temperature = low + curve * 2.8
+                return HourlyForecast(
+                    date: date,
+                    temperatureCelsius: temperature,
+                    feelsLikeCelsius: temperature,
+                    humidity: 88,
+                    dewPointCelsius: temperature - 1.2,
+                    windKph: 4,
+                    cloudCover: 18,
+                    precipitationProbability: 5
+                )
+            }
+        }
+
         return LocationForecast(locationID: locationID, generatedAt: Date.fixedNoon, hourly: hours)
     }
 }

@@ -68,13 +68,19 @@ struct FrostRiskCalculator {
 
     private func overnightHours(from hourly: [HourlyForecast], now: Date) -> [HourlyForecast] {
         let calendar = Calendar.current
-        return hourly.filter { hour in
-            guard hour.date >= now else { return false }
-            let hourOfDay = calendar.component(.hour, from: hour.date)
-            return hourOfDay >= 18 || hourOfDay <= 9
+        let hourOfDay = calendar.component(.hour, from: now)
+        let targetDay = hourOfDay <= 9
+            ? calendar.date(byAdding: .day, value: -1, to: now) ?? now
+            : now
+
+        guard let nightStart = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: targetDay),
+              let nightEnd = calendar.date(byAdding: .hour, value: 16, to: nightStart) else {
+            return []
         }
-        .prefix(18)
-        .map { $0 }
+
+        return hourly.filter { hour in
+            hour.date >= now && hour.date >= nightStart && hour.date < nightEnd
+        }
     }
 
     private func effectiveTemperature(_ hour: HourlyForecast) -> Double {
