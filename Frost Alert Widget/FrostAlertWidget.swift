@@ -67,15 +67,9 @@ private struct FrostSmallWidget: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let snapshot, let location = primaryLocation {
-                HStack(alignment: .center, spacing: 8) {
-                    FrostWidgetMark(size: 28)
-                    Text("Frost Alert")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(FrostWidgetPalette.ink)
-                        .lineLimit(1)
-                }
+                FrostWidgetMark(size: 30)
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 10)
 
                 RiskBadgeText(risk: location.risk, size: .large)
                     .padding(.bottom, 4)
@@ -91,7 +85,7 @@ private struct FrostSmallWidget: View {
                     .foregroundStyle(FrostWidgetPalette.secondary)
                     .lineLimit(1)
 
-                Spacer(minLength: 10)
+                Spacer(minLength: 8)
 
                 Text(shortFreshnessText(for: snapshot))
                     .font(.system(size: 12, weight: .medium))
