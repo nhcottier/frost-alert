@@ -43,7 +43,10 @@ struct FrostRiskCalculator {
         if !frostFormationHours.isEmpty { score += 12 }
         score = min(score, 100)
         if coldHours.isEmpty {
-            score = min(score, 49)
+            let marginAboveThreshold = minimumTemperature - threshold
+            score = marginAboveThreshold > 4
+                ? min(score, 25)
+                : min(score, 49)
         }
 
         let level: FrostRiskLevel

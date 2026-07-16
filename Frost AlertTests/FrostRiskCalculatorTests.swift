@@ -33,6 +33,16 @@ final class FrostRiskCalculatorTests: XCTestCase {
         XCTAssertNil(assessment.likelyStart)
     }
 
+    func testSafeRiskWhenLowIsWellAboveThresholdDespiteFrostWeatherSignals() {
+        let location = GrowingLocation(name: "Home", subtitle: "Garden", crop: "Grapes", sensitivity: .sensitive)
+        let forecast = forecast(locationID: location.id, low: 8.3, wind: 2, cloud: 8, humidity: 94)
+
+        let assessment = FrostRiskCalculator().assess(location: location, forecast: forecast, now: Date.fixedNoon)
+
+        XCTAssertEqual(assessment.level, .safe)
+        XCTAssertNil(assessment.likelyStart)
+    }
+
     func testWatchRiskWhenFrostWeatherSignalsArePresentButTemperatureStaysAboveThreshold() {
         let location = GrowingLocation(name: "Home", subtitle: "Garden", crop: "Sensitive plants", sensitivity: .sensitive)
         let forecast = forecast(locationID: location.id, low: 4.7, wind: 2, cloud: 8, humidity: 94)
