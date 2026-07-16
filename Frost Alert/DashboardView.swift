@@ -260,22 +260,72 @@ private struct DashboardHeader: View {
         assessments.map(\.assessment.level).max { $0.sortOrder < $1.sortOrder } ?? .safe
     }
 
+    private var lowestTemperatureText: String {
+        let lows = assessments
+            .map(\.assessment)
+            .filter(\.hasForecastData)
+            .map(\.minimumTemperatureCelsius)
+        guard let lowest = lows.min() else { return "Low unavailable" }
+        return "\(lowest.formatted(.number.precision(.fractionLength(0...1)))) C low"
+    }
+
+    private var frostWindowText: String {
+        let windows = assessments.compactMap { assessment -> (Date, Date)? in
+            guard let start = assessment.assessment.likelyStart, let end = assessment.assessment.likelyEnd else {
+                return nil
+            }
+            return (start, end)
+        }
+        guard let earliest = windows.min(by: { $0.0 < $1.0 }) else { return "No frost period" }
+        return "\(earliest.0.formatted(date: .omitted, time: .shortened)) - \(earliest.1.formatted(date: .omitted, time: .shortened))"
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Tonight and tomorrow morning")
-                .font(.subheadline.weight(.semibold))
+                .font(.footnote.weight(.semibold))
                 .foregroundStyle(FrostPalette.secondaryText)
+
             Text(highestRisk.rawValue)
-                .font(.system(.largeTitle, design: .rounded, weight: .semibold))
+                .font(.system(size: 54, weight: .bold, design: .rounded))
                 .foregroundStyle(highestRisk.color)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
-            Text("Focused frost guidance for growing locations, not a full weather dashboard.")
-                .font(.callout)
+
+            Text("Focused frost guidance for your growing locations.")
+                .font(.body)
                 .foregroundStyle(FrostPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                SummaryPill(icon: "mappin.and.ellipse", text: "\(assessments.count) location\(assessments.count == 1 ? "" : "s")")
+                SummaryPill(icon: "thermometer.low", text: lowestTemperatureText)
+                SummaryPill(icon: "clock", text: frostWindowText)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 2)
-        .padding(.bottom, 4)
+        .padding(.top, 8)
+        .padding(.bottom, 2)
+    }
+}
+
+private struct SummaryPill: View {
+    var icon: String
+    var text: String
+
+    var body: some View {
+        Label(text, systemImage: icon)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(FrostPalette.ink.opacity(0.82))
+            .lineLimit(1)
+            .minimumScaleFactor(0.76)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(.white.opacity(0.62), in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(FrostPalette.separator, lineWidth: 1)
+            }
     }
 }
 
@@ -291,20 +341,21 @@ private struct LocationRiskCard: View {
     private var location: GrowingLocation { locationAssessment.location }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 12) {
                 Button(action: toggleCollapse) {
-                    Image(systemName: isCollapsed ? "chevron.right.circle" : "chevron.down.circle")
-                        .font(.title3)
+                    Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(FrostPalette.blue)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 38, height: 38)
+                        .background(FrostPalette.blue.opacity(0.08), in: Circle())
                 }
                 .accessibilityLabel(isCollapsed ? "Expand \(location.name)" : "Collapse \(location.name)")
                 .disabled(isReordering)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(location.name)
-                        .font(.title3.weight(.semibold))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(FrostPalette.ink)
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
@@ -312,13 +363,9 @@ private struct LocationRiskCard: View {
                         .layoutPriority(1)
                     Text("\(location.crop) - \(location.sensitivity.name)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    if isCollapsed {
-                        Text(collapsedDetailText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                        .foregroundStyle(FrostPalette.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -358,47 +405,54 @@ private struct LocationRiskCard: View {
                 }
             }
 
+            if isCollapsed {
+                CollapsedMetricsRow(expectedLowText: expectedLowText, frostPeriodText: frostPeriodText)
+            }
+
             if !isCollapsed {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     MetricRow(icon: "thermometer.low", label: "Expected low", value: expectedLowText)
                     MetricRow(icon: "clock", label: "Frost forecast period", value: frostPeriodText)
                     MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
                 }
+                .padding(12)
+                .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
 
                 ThreeDayOutlookView(outlook: locationAssessment.outlook)
 
                 Text(assessment.summary)
-                    .font(.body)
+                    .font(.callout)
                     .foregroundStyle(FrostPalette.ink)
                     .fixedSize(horizontal: false, vertical: true)
 
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(assessment.actions, id: \.self) { action in
                         Label(action, systemImage: "checkmark.circle")
-                            .font(.subheadline)
+                            .font(.callout)
                             .foregroundStyle(FrostPalette.ink.opacity(0.86))
                     }
                 }
+                .padding(.top, 2)
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Why")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 7) {
+                    Label("Why this rating", systemImage: "info.circle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(FrostPalette.secondaryText)
                     ForEach(assessment.drivers, id: \.self) { driver in
                         Text(driver)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(FrostPalette.secondaryText)
                     }
                 }
             }
         }
         .padding(16)
-        .background(FrostPalette.card, in: RoundedRectangle(cornerRadius: 8))
+        .background(FrostPalette.card, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(assessment.level.cardStroke, lineWidth: 1)
         )
-        .shadow(color: FrostPalette.shadow, radius: 10, x: 0, y: 5)
+        .shadow(color: FrostPalette.shadow, radius: 16, x: 0, y: 8)
     }
 
     private var expectedLowText: String {
@@ -406,16 +460,51 @@ private struct LocationRiskCard: View {
         return "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C"
     }
 
-    private var collapsedDetailText: String {
-        guard assessment.hasForecastData else { return "Low unavailable | Frost: None" }
-        return "Low \(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C | Frost: \(frostPeriodText)"
-    }
-
     private var frostPeriodText: String {
         guard let start = assessment.likelyStart, let end = assessment.likelyEnd else {
             return "None"
         }
         return "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
+    }
+}
+
+private struct CollapsedMetricsRow: View {
+    var expectedLowText: String
+    var frostPeriodText: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            CompactMetricPill(icon: "thermometer.low", label: "Low", value: expectedLowText)
+            CompactMetricPill(icon: "clock", label: "Frost", value: frostPeriodText)
+        }
+    }
+}
+
+private struct CompactMetricPill: View {
+    var icon: String
+    var label: String
+    var value: String
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Image(systemName: icon)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(FrostPalette.blue)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(label)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(FrostPalette.secondaryText)
+                Text(value)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(FrostPalette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
@@ -450,19 +539,19 @@ private struct ThreeDayOutlookView: View {
     var outlook: [ScheduledLocationAssessment]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("3-day frost outlook")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            Label("3-day frost outlook", systemImage: "calendar")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(FrostPalette.secondaryText)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 10) {
                 ForEach(outlook.prefix(3)) { assessment in
                     OutlookRow(assessment: assessment)
                 }
             }
         }
         .padding(12)
-        .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
+        .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
@@ -480,12 +569,7 @@ private struct OutlookRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 8)
-            Text(assessment.assessment.level.rawValue)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(assessment.assessment.level.color)
-                .multilineTextAlignment(.trailing)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
+            RiskBadge(level: assessment.assessment.level, compact: true)
         }
         .accessibilityElement(children: .combine)
     }
@@ -519,13 +603,17 @@ private struct OutlookRow: View {
 
 private struct RiskBadge: View {
     var level: FrostRiskLevel
+    var compact = false
 
     var body: some View {
         Text(level.rawValue)
-            .font(.caption.weight(.bold))
+            .font((compact ? Font.caption2 : Font.caption).weight(.bold))
             .foregroundStyle(level.color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
+            .lineLimit(2)
+            .minimumScaleFactor(0.76)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, compact ? 8 : 10)
+            .padding(.vertical, compact ? 5 : 7)
             .background(level.badgeBackground, in: Capsule())
             .accessibilityLabel("Risk level \(level.rawValue)")
     }
@@ -591,27 +679,27 @@ private struct ForecastFreshnessView: View {
 
     var body: some View {
         if let lastSuccessfulRefresh, let alertCoverageEnd {
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Alerts updated \(lastSuccessfulRefresh.formatted(date: .omitted, time: .shortened))", systemImage: "arrow.clockwise.circle")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(isStale ? FrostPalette.watch : FrostPalette.ink)
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: isStale ? "exclamationmark.arrow.triangle.2.circlepath" : "checkmark.circle")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(isStale ? FrostPalette.watch : FrostPalette.safe)
+                    .frame(width: 28)
 
-                Label("Forecast alerts cover through \(alertCoverageEnd.formatted(date: .abbreviated, time: .shortened))", systemImage: "calendar.badge.clock")
-                    .font(.caption)
-                    .foregroundStyle(FrostPalette.secondaryText)
-
-                if isStale {
-                    Text("This forecast is more than 24 hours old. Pull down to refresh before relying on alerts.")
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(isStale ? "Forecast needs refresh" : "Alerts are up to date")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(isStale ? FrostPalette.watch : FrostPalette.ink)
+                    Text("Updated \(lastSuccessfulRefresh.formatted(date: .omitted, time: .shortened)) · covers to \(alertCoverageEnd.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption)
-                        .foregroundStyle(FrostPalette.watch)
+                        .foregroundStyle(FrostPalette.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding(12)
+            .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isStale ? FrostPalette.watch.opacity(0.10) : FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
+            .background(isStale ? FrostPalette.watch.opacity(0.10) : FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .stroke(isStale ? FrostPalette.watch.opacity(0.24) : FrostPalette.separator, lineWidth: 1)
             )
         }
@@ -661,16 +749,22 @@ private struct Banner: View {
 
 private struct DisclaimerView: View {
     var body: some View {
-        Text("Forecasts are guidance only. For high-value crops, use local sensors and professional frost systems as needed.")
-            .font(.footnote)
-            .foregroundStyle(FrostPalette.secondaryText)
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(FrostPalette.separator, lineWidth: 1)
-            )
+        Label {
+            Text("Forecasts are guidance only. For high-value crops, use local sensors and professional frost systems as needed.")
+                .font(.footnote)
+                .foregroundStyle(FrostPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: "shield.lefthalf.filled")
+                .foregroundStyle(FrostPalette.blue.opacity(0.76))
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.46), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(FrostPalette.separator, lineWidth: 1)
+        )
     }
 }
 
@@ -963,11 +1057,11 @@ private enum SensitivityOption: String, CaseIterable, Identifiable {
 }
 
 private enum FrostPalette {
-    static let background = Color(red: 0.92, green: 0.96, blue: 1.0)
-    static let card = Color(uiColor: .secondarySystemGroupedBackground)
-    static let panel = Color(red: 0.96, green: 0.98, blue: 1.0)
+    static let background = Color(red: 0.91, green: 0.96, blue: 1.0)
+    static let card = Color.white.opacity(0.92)
+    static let panel = Color(red: 0.95, green: 0.98, blue: 1.0)
     static let separator = Color(uiColor: .separator).opacity(0.22)
-    static let shadow = Color(red: 0.04, green: 0.12, blue: 0.24).opacity(0.08)
+    static let shadow = Color(red: 0.04, green: 0.12, blue: 0.24).opacity(0.07)
     static let ink = Color(red: 0.06, green: 0.12, blue: 0.20)
     static let secondaryText = Color(uiColor: .secondaryLabel)
     static let safe = Color(red: 0.15, green: 0.47, blue: 0.30)
