@@ -96,6 +96,7 @@ struct FrostRiskAssessment: Equatable {
     var summary: String
     var drivers: [String]
     var actions: [String]
+    var hasForecastData: Bool = true
 }
 
 struct LocationAssessment: Identifiable, Equatable {

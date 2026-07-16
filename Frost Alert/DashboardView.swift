@@ -290,7 +290,7 @@ private struct LocationRiskCard: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     if isCollapsed {
-                        Text("Low \(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C | Frost: \(frostPeriodText)")
+                        Text(collapsedDetailText)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -336,7 +336,7 @@ private struct LocationRiskCard: View {
 
             if !isCollapsed {
                 VStack(alignment: .leading, spacing: 10) {
-                    MetricRow(icon: "thermometer.low", label: "Expected low", value: "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
+                    MetricRow(icon: "thermometer.low", label: "Expected low", value: expectedLowText)
                     MetricRow(icon: "clock", label: "Frost forecast period", value: frostPeriodText)
                     MetricRow(icon: "slider.horizontal.3", label: "Plant threshold", value: "\(location.sensitivity.thresholdCelsius.formatted(.number.precision(.fractionLength(0...1)))) C")
                 }
@@ -375,6 +375,16 @@ private struct LocationRiskCard: View {
                 .stroke(assessment.level.cardStroke, lineWidth: 1)
         )
         .shadow(color: FrostPalette.shadow, radius: 10, x: 0, y: 5)
+    }
+
+    private var expectedLowText: String {
+        guard assessment.hasForecastData else { return "Unavailable" }
+        return "\(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C"
+    }
+
+    private var collapsedDetailText: String {
+        guard assessment.hasForecastData else { return "Low unavailable | Frost: None" }
+        return "Low \(assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))) C | Frost: \(frostPeriodText)"
     }
 
     private var frostPeriodText: String {
@@ -468,6 +478,9 @@ private struct OutlookRow: View {
     }
 
     private var detailText: String {
+        guard assessment.assessment.hasForecastData else {
+            return "Low unavailable | Frost: None"
+        }
         let low = assessment.assessment.minimumTemperatureCelsius.formatted(.number.precision(.fractionLength(0...1)))
         return "Low \(low) C | Frost: \(frostPeriodText)"
     }

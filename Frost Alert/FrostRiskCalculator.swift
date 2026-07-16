@@ -12,7 +12,8 @@ struct FrostRiskCalculator {
                 likelyEnd: nil,
                 summary: "No overnight forecast is available yet.",
                 drivers: ["Forecast data unavailable"],
-                actions: ["Check again later before making frost-protection decisions."]
+                actions: ["Check again later before making frost-protection decisions."],
+                hasForecastData: false
             )
         }
 
@@ -68,7 +69,7 @@ struct FrostRiskCalculator {
     private func overnightHours(from hourly: [HourlyForecast], now: Date) -> [HourlyForecast] {
         let calendar = Calendar.current
         let hourOfDay = calendar.component(.hour, from: now)
-        let targetDay = hourOfDay <= 9
+        let targetDay = hourOfDay < 9
             ? calendar.date(byAdding: .day, value: -1, to: now) ?? now
             : now
 

@@ -99,6 +99,17 @@ final class FrostRiskCalculatorTests: XCTestCase {
         XCTAssertNil(assessment.likelyStart)
     }
 
+    func testMorningAfterFrostWindowUsesUpcomingNight() {
+        let location = GrowingLocation(name: "Home", subtitle: "Garden", crop: "Grapes", sensitivity: .sensitive)
+        let forecast = multiNightForecast(locationID: location.id, lows: [8.3])
+
+        let assessment = FrostRiskCalculator().assess(location: location, forecast: forecast, now: Date.fixedMorningAfterFrostWindow)
+
+        XCTAssertTrue(assessment.hasForecastData)
+        XCTAssertEqual(assessment.minimumTemperatureCelsius, 8.3, accuracy: 0.01)
+        XCTAssertNotEqual(assessment.summary, "No overnight forecast is available yet.")
+    }
+
     private func forecast(locationID: UUID, low: Double, wind: Double, cloud: Double, humidity: Double) -> LocationForecast {
         let calendar = Calendar.current
         let start = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: Date.fixedNoon)!
@@ -153,6 +164,16 @@ private extension Date {
         components.month = 7
         components.day = 6
         components.hour = 12
+        return Calendar.current.date(from: components)!
+    }
+
+    static var fixedMorningAfterFrostWindow: Date {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 7
+        components.day = 6
+        components.hour = 9
+        components.minute = 43
         return Calendar.current.date(from: components)!
     }
 }
