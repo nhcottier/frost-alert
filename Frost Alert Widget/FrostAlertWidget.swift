@@ -61,41 +61,40 @@ private struct FrostSmallWidget: View {
     var snapshot: FrostWidgetSnapshot?
 
     private var primaryLocation: FrostWidgetLocationSnapshot? {
-        snapshot?.locations.max { $0.risk.sortOrder < $1.risk.sortOrder }
+        snapshot?.rankedLocations.first
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .center, spacing: 0) {
-                FrostWidgetMark(size: 34)
-                Spacer(minLength: 0)
-            }
-
+        VStack(alignment: .leading, spacing: 0) {
             if let snapshot, let location = primaryLocation {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(location.risk.shortLabel)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundStyle(location.risk.color)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.58)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(location.name)
-                        .font(.system(size: 18, weight: .semibold))
+                HStack(alignment: .center, spacing: 8) {
+                    FrostWidgetMark(size: 28)
+                    Text("Frost Alert")
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(FrostWidgetPalette.ink)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-
-                    Text(shortLowText(for: location))
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(FrostWidgetPalette.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
                 }
 
-                Spacer(minLength: 0)
+                Spacer(minLength: 12)
+
+                RiskBadgeText(risk: location.risk, size: .large)
+                    .padding(.bottom, 4)
+
+                Text(location.name)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(FrostWidgetPalette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+
+                Text(shortLowText(for: location))
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(FrostWidgetPalette.secondary)
+                    .lineLimit(1)
+
+                Spacer(minLength: 10)
+
                 Text(shortFreshnessText(for: snapshot))
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(snapshot.isStale ? FrostWidgetPalette.watch : FrostWidgetPalette.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -111,46 +110,15 @@ private struct FrostMediumWidget: View {
     var snapshot: FrostWidgetSnapshot?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 13) {
-            WidgetHeader(snapshot: snapshot, compact: false)
-
+        VStack(alignment: .leading, spacing: 14) {
             if let snapshot, !snapshot.locations.isEmpty {
-                VStack(spacing: 11) {
-                    ForEach(snapshot.locations.prefix(3)) { location in
-                        HStack(alignment: .center, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(location.name)
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundStyle(FrostWidgetPalette.ink)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.75)
-                                Text(shortLowText(for: location) + " | Frost: " + location.frostPeriod)
-                                    .font(.system(size: 13, weight: .regular))
-                                    .foregroundStyle(FrostWidgetPalette.secondary)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.75)
-                            }
-                            Spacer(minLength: 6)
-                            Text(location.risk.shortLabel)
-                                .font(.system(size: 21, weight: .bold, design: .rounded))
-                                .foregroundStyle(location.risk.color)
-                                .multilineTextAlignment(.trailing)
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.55)
-                                .frame(width: 104, alignment: .trailing)
-                        }
-                    }
+                MediumHeader(snapshot: snapshot)
+                if snapshot.locations.count == 1, let location = snapshot.locations.first {
+                    SingleLocationMediumContent(location: location)
+                } else {
+                    MultiLocationMediumContent(locations: snapshot.rankedLocations)
                 }
-
-                Spacer(minLength: 0)
-                HStack(spacing: 6) {
-                    Text(shortFreshnessText(for: snapshot))
-                    Text("Covers to \(snapshot.coverageEnd.formatted(date: .omitted, time: .shortened))")
-                }
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(snapshot.isStale ? FrostWidgetPalette.watch : FrostWidgetPalette.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                MediumFooter(snapshot: snapshot)
             } else {
                 EmptyWidgetContent()
             }
@@ -159,27 +127,135 @@ private struct FrostMediumWidget: View {
     }
 }
 
-private struct WidgetHeader: View {
+private struct MediumHeader: View {
     var snapshot: FrostWidgetSnapshot?
-    var compact: Bool
 
     var body: some View {
-        HStack(spacing: 7) {
-            FrostWidgetMark(size: compact ? 26 : 36)
+        HStack(alignment: .center, spacing: 9) {
+            FrostWidgetMark(size: 30)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("Frost Alert")
-                    .font((compact ? Font.caption : Font.title3).weight(.bold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(FrostWidgetPalette.ink)
                     .lineLimit(1)
                 if let snapshot {
                     Text(snapshot.isStale ? "Needs refresh" : "Latest forecast")
-                        .font(compact ? .caption2 : .callout)
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(snapshot.isStale ? FrostWidgetPalette.watch : FrostWidgetPalette.secondary)
                         .lineLimit(1)
                 }
             }
+
             Spacer(minLength: 0)
+        }
+    }
+}
+
+private struct SingleLocationMediumContent: View {
+    var location: FrostWidgetLocationSnapshot
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 7) {
+                Text(location.name)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(FrostWidgetPalette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                HStack(spacing: 6) {
+                    Text(shortLowText(for: location))
+                    Text("Frost: \(location.frostPeriod)")
+                }
+                .font(.system(size: 14, weight: .regular))
+                .foregroundStyle(FrostWidgetPalette.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+            }
+
+            Spacer(minLength: 8)
+
+            RiskBadgeText(risk: location.risk, size: .medium)
+                .frame(maxWidth: 128, alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct MultiLocationMediumContent: View {
+    var locations: [FrostWidgetLocationSnapshot]
+
+    var body: some View {
+        VStack(spacing: 9) {
+            ForEach(locations.prefix(3)) { location in
+                HStack(alignment: .center, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(location.name)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(FrostWidgetPalette.ink)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                        Text(shortLowText(for: location) + " | Frost: " + location.frostPeriod)
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundStyle(FrostWidgetPalette.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    RiskBadgeText(risk: location.risk, size: .compact)
+                        .frame(width: 96, alignment: .trailing)
+                }
+            }
+        }
+    }
+}
+
+private struct MediumFooter: View {
+    var snapshot: FrostWidgetSnapshot
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(shortFreshnessText(for: snapshot))
+            Text("Covers to \(snapshot.coverageEnd.formatted(date: .omitted, time: .shortened))")
+        }
+        .font(.system(size: 12, weight: .medium))
+        .foregroundStyle(snapshot.isStale ? FrostWidgetPalette.watch : FrostWidgetPalette.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.72)
+    }
+}
+
+private struct RiskBadgeText: View {
+    enum Size {
+        case compact
+        case medium
+        case large
+    }
+
+    var risk: FrostWidgetRiskLevel
+    var size: Size
+
+    var body: some View {
+        Text(risk.shortLabel)
+            .font(font)
+            .foregroundStyle(risk.color)
+            .lineLimit(2)
+            .minimumScaleFactor(0.62)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var font: Font {
+        switch size {
+        case .compact:
+            return .system(size: 16, weight: .bold, design: .rounded)
+        case .medium:
+            return .system(size: 30, weight: .bold, design: .rounded)
+        case .large:
+            return .system(size: 29, weight: .bold, design: .rounded)
         }
     }
 }
@@ -251,6 +327,17 @@ private func shortFreshnessText(for snapshot: FrostWidgetSnapshot) -> String {
     }
     let hours = max(1, minutes / 60)
     return "Updated \(hours)h ago"
+}
+
+private extension FrostWidgetSnapshot {
+    var rankedLocations: [FrostWidgetLocationSnapshot] {
+        locations.sorted {
+            if $0.risk.sortOrder == $1.risk.sortOrder {
+                return $0.name.localizedStandardCompare($1.name) == .orderedAscending
+            }
+            return $0.risk.sortOrder > $1.risk.sortOrder
+        }
+    }
 }
 
 private enum FrostWidgetPalette {
