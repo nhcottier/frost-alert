@@ -7,19 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A293159DA64FDFDC07CF0D9 /* Frost Alert Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAE77C0276C88B3072C5F605 /* Frost Alert Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		129FB85302FC054446D339A5 /* FrostRiskCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */; };
 		2623CA88FFFA15431D69CD84 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD833F95EDAE0AADA79C18AF /* Assets.xcassets */; };
 		278171EA6F7BFAEF85051F9F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61AF54702C9B25968C1E7E /* Models.swift */; };
+		3D3AFECB132FB0EFC71BA00D /* FrostWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165784FB8567B5B1AE7F3022 /* FrostWidgetSnapshot.swift */; };
 		55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5077C258B1F292F1AA43FC /* DashboardView.swift */; };
 		840D186585E69573B6A27BEC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4703A62EFB4A3126B4135CAE /* AppModel.swift */; };
 		92546D88437D42E62F44A3DA /* LocationSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A38D70C9E42744C192E29D /* LocationSearchService.swift */; };
 		92904C50D43CCC3825E92B17 /* FrostRiskCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */; };
+		C03DB6EEFD45B79DAAE723EC /* FrostWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165784FB8567B5B1AE7F3022 /* FrostWidgetSnapshot.swift */; };
 		D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FC4FAC1F54BA51891E370E /* NotificationService.swift */; };
 		E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BA18A84370C80E66640DDB /* FrostAlertApp.swift */; };
+		EC9CD160BE7FEDA42DC11C1E /* FrostAlertWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166EBC1CE5ECB715E931A419 /* FrostAlertWidget.swift */; };
 		F5C7B4D2962ABCA12B99681D /* WeatherProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		02A59EB44C87D5D12948821A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D6C81D50954EA709FDC1F496 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 128CE0663412269C0F2F609D;
+			remoteInfo = "Frost Alert Widget";
+		};
 		C31D2020E171F0EA9A3057ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D6C81D50954EA709FDC1F496 /* Project object */;
@@ -29,19 +40,38 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1721EF90F4A3AF94D95B0C7B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0A293159DA64FDFDC07CF0D9 /* Frost Alert Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		031162DA8B5209F022961A65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		03FC4FAC1F54BA51891E370E /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		0D57CAFA5C1609A2399731F3 /* FrostRiskCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostRiskCalculator.swift; sourceTree = "<group>"; };
+		165784FB8567B5B1AE7F3022 /* FrostWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostWidgetSnapshot.swift; sourceTree = "<group>"; };
+		166EBC1CE5ECB715E931A419 /* FrostAlertWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostAlertWidget.swift; sourceTree = "<group>"; };
 		1E5077C258B1F292F1AA43FC /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		1E5E0C9438F68D98995951EE /* Frost AlertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Frost AlertTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4703A62EFB4A3126B4135CAE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		58747715F755AB734D76BA9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		83BA18A84370C80E66640DDB /* FrostAlertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostAlertApp.swift; sourceTree = "<group>"; };
 		885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Frost Alert.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9587487A9B453F26480119AD /* FrostAlertWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FrostAlertWidget.entitlements; sourceTree = "<group>"; };
 		98A38D70C9E42744C192E29D /* LocationSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchService.swift; sourceTree = "<group>"; };
 		AB61AF54702C9B25968C1E7E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		AD833F95EDAE0AADA79C18AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BAC8C8A65FABAE77756CD92C /* FrostRiskCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrostRiskCalculatorTests.swift; sourceTree = "<group>"; };
+		DAE77C0276C88B3072C5F605 /* Frost Alert Widget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = "Frost Alert Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F12DDA6C1E5E05891847604E /* FrostAlert.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FrostAlert.entitlements; sourceTree = "<group>"; };
 		FA445328CB1FB2F1EDA6CE2F /* WeatherProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,6 +80,7 @@
 		6F980473C7684ABE8EE6BEA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				DAE77C0276C88B3072C5F605 /* Frost Alert Widget.appex */,
 				885B6E3A46A54FCA7C9B3975 /* Frost Alert.app */,
 				1E5E0C9438F68D98995951EE /* Frost AlertTests.xctest */,
 			);
@@ -74,6 +105,24 @@
 			path = "Frost Alert";
 			sourceTree = "<group>";
 		};
+		9ACA7F0916EF4DEF519BE2C5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				165784FB8567B5B1AE7F3022 /* FrostWidgetSnapshot.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A80367DFA4AAAE0EC66B3BF0 /* Frost Alert Widget */ = {
+			isa = PBXGroup;
+			children = (
+				9587487A9B453F26480119AD /* FrostAlertWidget.entitlements */,
+				166EBC1CE5ECB715E931A419 /* FrostAlertWidget.swift */,
+				031162DA8B5209F022961A65 /* Info.plist */,
+			);
+			path = "Frost Alert Widget";
+			sourceTree = "<group>";
+		};
 		DAA4397423EDB2AA40AD72EB /* Frost AlertTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -86,7 +135,9 @@
 			isa = PBXGroup;
 			children = (
 				9A550F0EA64DD89050304018 /* Frost Alert */,
+				A80367DFA4AAAE0EC66B3BF0 /* Frost Alert Widget */,
 				DAA4397423EDB2AA40AD72EB /* Frost AlertTests */,
+				9ACA7F0916EF4DEF519BE2C5 /* Shared */,
 				6F980473C7684ABE8EE6BEA2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,6 +145,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		128CE0663412269C0F2F609D /* Frost Alert Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFFE3E068573FBEEC32E31BD /* Build configuration list for PBXNativeTarget "Frost Alert Widget" */;
+			buildPhases = (
+				7C188E5B199740719E36B4D4 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Frost Alert Widget";
+			packageProductDependencies = (
+			);
+			productName = "Frost Alert Widget";
+			productReference = DAE77C0276C88B3072C5F605 /* Frost Alert Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1C0D2368EA2732547651EA8D /* Frost AlertTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE9CA314B09A7E77B6208A6A /* Build configuration list for PBXNativeTarget "Frost AlertTests" */;
@@ -118,10 +186,12 @@
 			buildPhases = (
 				AEE7414648C80DD31FAD48B3 /* Sources */,
 				EA282242CB7B50447382C66B /* Resources */,
+				1721EF90F4A3AF94D95B0C7B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4442E883868E161FC29FED98 /* PBXTargetDependency */,
 			);
 			name = "Frost Alert";
 			packageProductDependencies = (
@@ -139,6 +209,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					128CE0663412269C0F2F609D = {
+						DevelopmentTeam = 8456988GD7;
+					};
 					1C0D2368EA2732547651EA8D = {
 						DevelopmentTeam = 8456988GD7;
 					};
@@ -162,6 +235,7 @@
 			projectRoot = "";
 			targets = (
 				5210FAFDFE45DA4E228D8179 /* Frost Alert */,
+				128CE0663412269C0F2F609D /* Frost Alert Widget */,
 				1C0D2368EA2732547651EA8D /* Frost AlertTests */,
 			);
 		};
@@ -179,6 +253,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7C188E5B199740719E36B4D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC9CD160BE7FEDA42DC11C1E /* FrostAlertWidget.swift in Sources */,
+				3D3AFECB132FB0EFC71BA00D /* FrostWidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		99C7DBFEA959AE7E065483CB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -195,6 +278,7 @@
 				55D1291768CF8C58EEBE98CC /* DashboardView.swift in Sources */,
 				E4392BBAC31927491B3A84ED /* FrostAlertApp.swift in Sources */,
 				129FB85302FC054446D339A5 /* FrostRiskCalculator.swift in Sources */,
+				C03DB6EEFD45B79DAAE723EC /* FrostWidgetSnapshot.swift in Sources */,
 				92546D88437D42E62F44A3DA /* LocationSearchService.swift in Sources */,
 				278171EA6F7BFAEF85051F9F /* Models.swift in Sources */,
 				D9E33622BE7F15AAA9F24A77 /* NotificationService.swift in Sources */,
@@ -205,6 +289,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4442E883868E161FC29FED98 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 128CE0663412269C0F2F609D /* Frost Alert Widget */;
+			targetProxy = 02A59EB44C87D5D12948821A /* PBXContainerItemProxy */;
+		};
 		D677B9E0F68D0EEC1C423CDB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5210FAFDFE45DA4E228D8179 /* Frost Alert */;
@@ -312,6 +401,23 @@
 			};
 			name = Release;
 		};
+		98B7A57D9B3AE97493732742 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = "Frost Alert Widget/FrostAlertWidget.entitlements";
+				INFOPLIST_FILE = "Frost Alert Widget/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		BE686E5D5E12B0A60AFEB588 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -345,6 +451,23 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Frost Alert.app/Frost Alert";
 			};
 			name = Release;
+		};
+		EE309D1606550FF309183F7F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = "Frost Alert Widget/FrostAlertWidget.entitlements";
+				INFOPLIST_FILE = "Frost Alert Widget/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nickcottier.frostalert.widget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		F0F745AFB418207CC8A72E09 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -418,6 +541,15 @@
 			buildConfigurations = (
 				636A0AE231D4DE7661D0E676 /* Debug */,
 				22EFDD867141C572C109FC1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CFFE3E068573FBEEC32E31BD /* Build configuration list for PBXNativeTarget "Frost Alert Widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE309D1606550FF309183F7F /* Debug */,
+				98B7A57D9B3AE97493732742 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

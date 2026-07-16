@@ -13,6 +13,8 @@ struct DashboardView: View {
     @State private var didApplyInitialCollapse = false
     @State private var isReordering = false
     @State private var draggingLocationID: UUID?
+    @State private var showingReliabilityInfo = false
+    @AppStorage("didShowAlertReliabilityInfo") private var didShowAlertReliabilityInfo = false
 
     var body: some View {
         NavigationStack {
@@ -49,6 +51,7 @@ struct DashboardView: View {
             }
             .task {
                 await appModel.load()
+                showReliabilityInfoIfNeeded()
             }
             .refreshable {
                 await appModel.load()
@@ -82,6 +85,13 @@ struct DashboardView: View {
             } message: { location in
                 Text("This removes \(location.name) and its scheduled frost alerts.")
             }
+            .alert("Keep frost alerts up to date", isPresented: $showingReliabilityInfo) {
+                Button("Got it") {
+                    didShowAlertReliabilityInfo = true
+                }
+            } message: {
+                Text("Frost Alert schedules warnings from the latest forecast for the next three nights. Your iPhone refreshes them in the background when possible. Open Frost Alert every few days to keep future alerts up to date.")
+            }
         }
     }
 
@@ -113,7 +123,11 @@ struct DashboardView: View {
                 showingAddLocation = true
             }
         case .failed(let message):
-            ErrorStateView(message: message) {
+            ErrorStateView(
+                message: message,
+                lastSuccessfulRefresh: appModel.lastSuccessfulRefresh,
+                alertCoverageEnd: appModel.alertCoverageEnd
+            ) {
                 Task { await appModel.load() }
             }
         case .loaded(let assessments):
@@ -121,6 +135,10 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     NotificationPermissionBanner()
                     DashboardHeader(assessments: assessments)
+                    ForecastFreshnessView(
+                        lastSuccessfulRefresh: appModel.lastSuccessfulRefresh,
+                        alertCoverageEnd: appModel.alertCoverageEnd
+                    )
                     ForEach(assessments) { assessment in
                         reorderableLocationCard(assessment)
                     }
@@ -140,6 +158,12 @@ struct DashboardView: View {
         guard !didApplyInitialCollapse else { return }
         collapsedLocationIDs = Set(assessments.map(\.location.id))
         didApplyInitialCollapse = true
+    }
+
+    private func showReliabilityInfoIfNeeded() {
+        guard !didShowAlertReliabilityInfo else { return }
+        guard case .loaded = appModel.state else { return }
+        showingReliabilityInfo = true
     }
 
     private func toggleCollapsedLocation(_ id: UUID) {
@@ -550,7 +574,7 @@ private struct NotificationPermissionBanner: View {
             Banner(
                 icon: "bell.badge",
                 title: "Get evening and morning frost alerts",
-                message: "Local notifications are scheduled on device when risk is watch or higher.",
+                message: "Alerts are scheduled from the latest refreshed forecast when risk is Watch or higher.",
                 actionTitle: "Allow"
             ) {
                 Task { await appModel.requestNotificationPermission() }
@@ -558,6 +582,44 @@ private struct NotificationPermissionBanner: View {
         default:
             EmptyView()
         }
+    }
+}
+
+private struct ForecastFreshnessView: View {
+    var lastSuccessfulRefresh: Date?
+    var alertCoverageEnd: Date?
+
+    var body: some View {
+        if let lastSuccessfulRefresh, let alertCoverageEnd {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Alerts updated \(lastSuccessfulRefresh.formatted(date: .omitted, time: .shortened))", systemImage: "arrow.clockwise.circle")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(isStale ? FrostPalette.watch : FrostPalette.ink)
+
+                Label("Forecast alerts cover through \(alertCoverageEnd.formatted(date: .abbreviated, time: .shortened))", systemImage: "calendar.badge.clock")
+                    .font(.caption)
+                    .foregroundStyle(FrostPalette.secondaryText)
+
+                if isStale {
+                    Text("This forecast is more than 24 hours old. Pull down to refresh before relying on alerts.")
+                        .font(.caption)
+                        .foregroundStyle(FrostPalette.watch)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(isStale ? FrostPalette.watch.opacity(0.10) : FrostPalette.panel, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isStale ? FrostPalette.watch.opacity(0.24) : FrostPalette.separator, lineWidth: 1)
+            )
+        }
+    }
+
+    private var isStale: Bool {
+        guard let lastSuccessfulRefresh else { return false }
+        return Date().timeIntervalSince(lastSuccessfulRefresh) > 24 * 60 * 60
     }
 }
 
@@ -647,6 +709,8 @@ private struct EmptyStateView: View {
 
 private struct ErrorStateView: View {
     var message: String
+    var lastSuccessfulRefresh: Date?
+    var alertCoverageEnd: Date?
     var retry: () -> Void
 
     var body: some View {
@@ -660,6 +724,19 @@ private struct ErrorStateView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            if let lastSuccessfulRefresh, let alertCoverageEnd {
+                VStack(spacing: 4) {
+                    Text("Last successful refresh: \(lastSuccessfulRefresh.formatted(date: .abbreviated, time: .shortened))")
+                    Text("Existing alerts cover through \(alertCoverageEnd.formatted(date: .abbreviated, time: .shortened))")
+                    if Date().timeIntervalSince(lastSuccessfulRefresh) > 24 * 60 * 60 {
+                        Text("This saved forecast is more than 24 hours old.")
+                            .foregroundStyle(FrostPalette.watch)
+                    }
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            }
             Button("Try again", action: retry)
                 .buttonStyle(.borderedProminent)
         }

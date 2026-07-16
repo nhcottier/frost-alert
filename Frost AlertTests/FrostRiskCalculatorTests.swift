@@ -120,6 +120,20 @@ final class FrostRiskCalculatorTests: XCTestCase {
         XCTAssertNotEqual(assessment.summary, "No overnight forecast is available yet.")
     }
 
+    func testWidgetSnapshotIsStaleAfterTwentyFourHours() {
+        let snapshot = FrostWidgetSnapshot(
+            generatedAt: Date.fixedNoon,
+            coverageEnd: Calendar.current.date(byAdding: .day, value: 3, to: Date.fixedNoon)!,
+            highestRisk: .safe,
+            locations: []
+        )
+        let oldEnough = Date.fixedNoon.addingTimeInterval((24 * 60 * 60) + 1)
+        let stillFresh = Date.fixedNoon.addingTimeInterval((24 * 60 * 60) - 1)
+
+        XCTAssertTrue(snapshot.isStale(now: oldEnough))
+        XCTAssertFalse(snapshot.isStale(now: stillFresh))
+    }
+
     private func forecast(locationID: UUID, low: Double, wind: Double, cloud: Double, humidity: Double) -> LocationForecast {
         let calendar = Calendar.current
         let start = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: Date.fixedNoon)!

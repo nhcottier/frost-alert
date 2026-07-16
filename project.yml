@@ -13,6 +13,10 @@ targets:
     platform: iOS
     sources:
       - path: Frost Alert
+      - path: Shared
+    dependencies:
+      - target: Frost Alert Widget
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nickcottier.frostalert
@@ -37,6 +41,19 @@ targets:
         UIBackgroundModes:
           - fetch
         UILaunchScreen: {}
+  Frost Alert Widget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Frost Alert Widget
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nickcottier.frostalert.widget
+        CODE_SIGN_ENTITLEMENTS: Frost Alert Widget/FrostAlertWidget.entitlements
+        INFOPLIST_FILE: Frost Alert Widget/Info.plist
+        TARGETED_DEVICE_FAMILY: 1
+        APPLICATION_EXTENSION_API_ONLY: YES
   Frost AlertTests:
     type: bundle.unit-test
     platform: iOS

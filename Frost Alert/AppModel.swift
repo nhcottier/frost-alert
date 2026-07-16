@@ -1,4 +1,5 @@
 import Foundation
+import WidgetKit
 
 enum DashboardState: Equatable {
     case loading
@@ -11,6 +12,8 @@ enum DashboardState: Equatable {
 final class AppModel: ObservableObject {
     @Published var locations: [GrowingLocation] = []
     @Published private(set) var state: DashboardState = .loading
+    @Published private(set) var lastSuccessfulRefresh: Date?
+    @Published private(set) var alertCoverageEnd: Date?
 
     let notifications = NotificationService()
 
@@ -20,6 +23,7 @@ final class AppModel: ObservableObject {
 
     init() {
         locations = loadSavedLocations()
+        restoreForecastSnapshotMetadata()
     }
 
     func load(requestNotificationPermission: Bool = true) async {
@@ -31,6 +35,7 @@ final class AppModel: ObservableObject {
 
         guard !locations.isEmpty else {
             state = .empty
+            clearForecastSnapshot()
             return
         }
 
@@ -47,6 +52,7 @@ final class AppModel: ObservableObject {
                 scheduledAssessments.append(contentsOf: outlook)
             }
             state = .loaded(assessments)
+            saveForecastSnapshot(for: assessments, scheduledAssessments: scheduledAssessments)
             await notifications.refreshAuthorizationStatus()
             await notifications.scheduleAlerts(for: scheduledAssessments)
         } catch {
@@ -147,6 +153,60 @@ final class AppModel: ObservableObject {
         UserDefaults.standard.set(data, forKey: storageKey)
     }
 
+    private func restoreForecastSnapshotMetadata() {
+        guard let snapshot = FrostWidgetStore.loadSnapshot(),
+              snapshot.generatedAt != .distantPast else { return }
+        lastSuccessfulRefresh = snapshot.generatedAt
+        alertCoverageEnd = snapshot.coverageEnd
+    }
+
+    private func saveForecastSnapshot(for assessments: [LocationAssessment], scheduledAssessments: [ScheduledLocationAssessment]) {
+        let generatedAt = Date()
+        let coverageEnd = coverageEndDate(for: scheduledAssessments) ?? generatedAt
+        lastSuccessfulRefresh = generatedAt
+        alertCoverageEnd = coverageEnd
+
+        let locations = assessments.map { assessment in
+            FrostWidgetLocationSnapshot(
+                id: assessment.location.id,
+                name: assessment.location.name,
+                crop: assessment.location.crop,
+                risk: FrostWidgetRiskLevel(assessment.assessment.level),
+                expectedLowCelsius: assessment.assessment.hasForecastData ? assessment.assessment.minimumTemperatureCelsius : nil,
+                frostPeriod: frostPeriodText(for: assessment.assessment)
+            )
+        }
+        let highestRisk = locations.map(\.risk).max { $0.sortOrder < $1.sortOrder } ?? .unavailable
+        FrostWidgetStore.saveSnapshot(
+            FrostWidgetSnapshot(
+                generatedAt: generatedAt,
+                coverageEnd: coverageEnd,
+                highestRisk: highestRisk,
+                locations: locations
+            )
+        )
+        WidgetCenter.shared.reloadTimelines(ofKind: FrostWidgetStore.widgetKind)
+    }
+
+    private func clearForecastSnapshot() {
+        lastSuccessfulRefresh = nil
+        alertCoverageEnd = nil
+        FrostWidgetStore.clearSnapshot()
+        WidgetCenter.shared.reloadTimelines(ofKind: FrostWidgetStore.widgetKind)
+    }
+
+    private func coverageEndDate(for assessments: [ScheduledLocationAssessment]) -> Date? {
+        guard let lastNight = assessments.map(\.nightStart).max() else { return nil }
+        return Calendar.current.date(byAdding: .hour, value: 16, to: lastNight)
+    }
+
+    private func frostPeriodText(for assessment: FrostRiskAssessment) -> String {
+        guard let start = assessment.likelyStart, let end = assessment.likelyEnd else {
+            return "None"
+        }
+        return "\(start.formatted(date: .omitted, time: .shortened))-\(end.formatted(date: .omitted, time: .shortened))"
+    }
+
     private func requestNotificationPermissionIfNeeded() async {
         await notifications.refreshAuthorizationStatus()
         guard notifications.authorizationStatus == .notDetermined else { return }
@@ -176,6 +236,17 @@ final class AppModel: ObservableObject {
             return "Apple Weather is not ready to provide forecasts yet. Try again in a few minutes."
         }
         return message
+    }
+}
+
+private extension FrostWidgetRiskLevel {
+    init(_ level: FrostRiskLevel) {
+        switch level {
+        case .safe: self = .safe
+        case .watch: self = .watch
+        case .frostLikely: self = .frostLikely
+        case .severe: self = .severe
+        }
     }
 }
 
