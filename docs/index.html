@@ -3,43 +3,152 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Frost Alert</title>
-  <meta name="description" content="Frost Alert helps growers, gardeners, vineyards, orchards, nurseries, and lifestyle blocks see clear overnight frost risk guidance.">
-  <link rel="stylesheet" href="styles.css">
+  <title>Frost Alert — Frost warnings for growers</title>
+  <meta name="description" content="Know when frost could threaten your garden, crops, orchard, vineyard, or nursery with clear overnight risk guidance for iPhone.">
+  <meta name="theme-color" content="#eaf6ff">
+  <meta property="og:title" content="Frost Alert — Know tonight's frost risk">
+  <meta property="og:description" content="Clear, plant-aware frost warnings and practical guidance for growers and gardeners.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nhcottier.github.io/frost-alert/">
+  <meta property="og:image" content="https://nhcottier.github.io/frost-alert/assets/screenshots/frost-risk-dashboard.png">
+  <link rel="icon" href="assets/frost-alert-icon.png">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <img class="app-icon" src="assets/frost-alert-icon.png" alt="Frost Alert app icon">
-      <p class="eyebrow">Frost Alert</p>
-      <h1>Focused frost guidance for growing locations.</h1>
-      <p class="lead">See tonight's frost risk, the expected overnight low, a three-night outlook, and practical actions for frost-sensitive plants and crops.</p>
-      <div class="actions">
-        <a class="button" href="support.html">Support</a>
-        <a class="button secondary" href="privacy.html">Privacy Policy</a>
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="Frost Alert home">
+      <img src="assets/frost-alert-icon.png" width="44" height="44" alt="">
+      <span>Frost Alert</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="#features">Features</a>
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="marketing-hero">
+      <div class="hero-copy">
+        <div class="availability"><span aria-hidden="true"></span> Built for iPhone</div>
+        <h1>Know tonight’s<br><em>frost risk.</em></h1>
+        <p class="hero-lead">Clear, plant-aware warnings for your garden, crops, orchard, vineyard, or nursery—so you can protect what you grow before temperatures fall.</p>
+        <div class="hero-actions">
+          <a class="button" href="#features">See how it works <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="support.html">Get support <span aria-hidden="true">→</span></a>
+        </div>
+        <ul class="quick-facts" aria-label="App highlights">
+          <li><strong>Tonight</strong><span>at a glance</span></li>
+          <li><strong>3 nights</strong><span>planned ahead</span></li>
+          <li><strong>Your plants</strong><span>your threshold</span></li>
+        </ul>
+      </div>
+
+      <div class="hero-showcase" aria-label="Frost Alert app screens">
+        <div class="ice-orb orb-one" aria-hidden="true"></div>
+        <div class="ice-orb orb-two" aria-hidden="true"></div>
+        <figure class="screen-card screen-card-back">
+          <img src="assets/screenshots/frost-notifications.png" alt="Frost Alert evening and morning notifications on iPhone" width="739" height="1600">
+        </figure>
+        <figure class="screen-card screen-card-front">
+          <img src="assets/screenshots/frost-risk-dashboard.png" alt="Frost Alert dashboard showing severe, watch, and safe frost risk levels" width="739" height="1600">
+        </figure>
+        <div class="risk-chip risk-chip-watch"><span></span> Watch</div>
+        <div class="risk-chip risk-chip-safe"><span></span> Safe</div>
       </div>
     </section>
 
-    <section class="grid" aria-label="Frost Alert features">
-      <article>
-        <h2>Clear Risk</h2>
-        <p>Safe, Watch, Frost likely, or Severe frost risk for each growing location.</p>
-      </article>
-      <article>
-        <h2>Three-Night Outlook</h2>
-        <p>Plan frost protection before the coldest nights arrive.</p>
-      </article>
-      <article>
-        <h2>Useful Alerts</h2>
-        <p>Local evening and morning notifications are scheduled from the latest refreshed forecast.</p>
-      </article>
-      <article>
-        <h2>Practical Actions</h2>
-        <p>Cover plants, move pots, check frost cloth, and protect seedlings before temperatures drop.</p>
-      </article>
+    <section class="audience-strip" aria-label="Who Frost Alert is for">
+      <p>Made for the people who grow</p>
+      <div>
+        <span>Gardeners</span><i aria-hidden="true"></i><span>Growers</span><i aria-hidden="true"></i><span>Orchards</span><i aria-hidden="true"></i><span>Vineyards</span><i aria-hidden="true"></i><span>Nurseries</span>
+      </div>
     </section>
 
-    <p class="disclaimer">Forecasts are guidance only. For high-value crops, use local sensors and professional frost systems as needed.</p>
+    <section class="story-section" id="features">
+      <div class="section-heading">
+        <p class="kicker">A clearer cold forecast</p>
+        <h2>From forecast<br>to action.</h2>
+        <p>Frost Alert turns overnight weather into a simple decision: what is at risk, when the cold is coming, and what you can do now.</p>
+      </div>
+
+      <div class="feature-story feature-story-wide">
+        <div class="feature-copy">
+          <span class="feature-number">01</span>
+          <h3>See the risk, not the noise.</h3>
+          <p>Each growing location gets a clear Safe, Watch, Frost likely, or Severe frost risk status, with the expected low and frost period shown up front.</p>
+          <div class="risk-scale" aria-label="Frost Alert risk levels">
+            <span class="safe">Safe</span><span class="watch">Watch</span><span class="likely">Frost likely</span><span class="severe">Severe</span>
+          </div>
+        </div>
+        <div class="feature-visual visual-dashboard">
+          <img src="assets/screenshots/frost-risk-dashboard.png" alt="Dashboard showing frost risk across three growing locations" loading="lazy" width="739" height="1600">
+        </div>
+      </div>
+
+      <div class="feature-pair">
+        <article class="feature-story feature-story-tall">
+          <div class="feature-copy">
+            <span class="feature-number">02</span>
+            <h3>Plan three nights ahead.</h3>
+            <p>Spot colder nights early, giving you time to ready frost cloth, irrigation, heaters, or fans.</p>
+          </div>
+          <div class="feature-visual visual-outlook">
+            <img src="assets/screenshots/three-day-outlook.png" alt="Three-night frost outlook for a vineyard location" loading="lazy" width="739" height="1600">
+          </div>
+        </article>
+
+        <article class="feature-story feature-story-tall feature-story-dark">
+          <div class="feature-copy">
+            <span class="feature-number">03</span>
+            <h3>Alerts before the freeze.</h3>
+            <p>Evening and morning notifications help you act before frost threatens sensitive plants or crops.</p>
+          </div>
+          <div class="feature-visual visual-notifications">
+            <img src="assets/screenshots/frost-notifications.png" alt="Frost warning notifications on iPhone" loading="lazy" width="739" height="1600">
+          </div>
+        </article>
+      </div>
+
+      <div class="feature-story feature-story-wide feature-story-reverse">
+        <div class="feature-copy">
+          <span class="feature-number">04</span>
+          <h3>Tuned to what you grow.</h3>
+          <p>Choose hardy, sensitive, very sensitive, or custom thresholds for each crop or garden area, then get practical guidance that fits.</p>
+          <ul class="check-list">
+            <li>Plant-specific sensitivity</li>
+            <li>Practical protection steps</li>
+            <li>Multiple growing locations</li>
+          </ul>
+        </div>
+        <div class="feature-visual visual-plants">
+          <img src="assets/screenshots/frost-alerts.png" alt="Plant sensitivity settings and tailored frost alerts" loading="lazy" width="739" height="1600">
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <img src="assets/frost-alert-icon.png" width="92" height="92" alt="Frost Alert app icon">
+      <p class="kicker">Cold nights, clearer decisions</p>
+      <h2>Protect what<br>you grow.</h2>
+      <p>Focused frost guidance for iPhone, powered by Apple Weather.</p>
+      <a class="button button-light" href="support.html">Learn more about Frost Alert</a>
+    </section>
+
+    <aside class="disclaimer marketing-disclaimer">
+      <strong>Forecasts are guidance.</strong>
+      <span>For high-value crops, use local sensors and professional frost-protection systems as needed.</span>
+    </aside>
   </main>
+
+  <footer class="site-footer">
+    <a class="wordmark footer-wordmark" href="index.html">
+      <img src="assets/frost-alert-icon.png" width="36" height="36" alt="">
+      <span>Frost Alert</span>
+    </a>
+    <p>Frost warnings for growers.</p>
+    <nav aria-label="Footer navigation"><a href="support.html">Support</a><a href="privacy.html">Privacy</a></nav>
+    <p class="copyright">© 2026 Frost Alert</p>
+  </footer>
 </body>
 </html>
