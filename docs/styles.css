@@ -285,15 +285,17 @@ img {
 }
 
 .screen-card img {
+  display: block;
   width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .screen-card-front {
   top: 4px;
   left: 15%;
   z-index: 2;
-  width: min(310px, 57%);
-  height: 608px;
+  width: min(286px, 53%);
   transform: rotate(-4deg);
 }
 
@@ -305,8 +307,7 @@ img {
   top: 80px;
   right: 0;
   z-index: 1;
-  width: min(278px, 50%);
-  height: 540px;
+  width: min(248px, 46%);
   transform: rotate(7deg);
 }
 
@@ -536,6 +537,8 @@ img {
 .feature-visual img {
   position: absolute;
   width: 350px;
+  height: auto;
+  object-fit: contain;
   border: 8px solid white;
   border-radius: 28px 28px 0 0;
   box-shadow: 0 26px 64px rgba(23, 83, 130, 0.16);
@@ -978,15 +981,13 @@ img {
 
   .screen-card-front {
     left: 7%;
-    width: 58%;
-    height: 480px;
+    width: 53%;
   }
 
   .screen-card-back {
     top: 66px;
     right: 8px;
-    width: 52%;
-    height: 420px;
+    width: 46%;
   }
 
   .risk-chip-watch { top: 9%; }
@@ -1160,9 +1161,6 @@ img {
     border-width: 6px;
     border-radius: 25px;
   }
-
-  .screen-card-front { height: 410px; }
-  .screen-card-back { height: 360px; }
 
   .risk-chip {
     padding: 9px 12px;
