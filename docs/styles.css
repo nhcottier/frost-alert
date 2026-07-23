@@ -586,6 +586,13 @@ img {
   transform: translateX(-50%);
 }
 
+.visual-outlook img {
+  height: 430px;
+  object-fit: cover;
+  object-position: 50% 45%;
+  border-radius: 28px;
+}
+
 .feature-story-dark {
   border-color: rgba(255, 255, 255, 0.1);
   background: linear-gradient(155deg, #082a57, #06477f);
